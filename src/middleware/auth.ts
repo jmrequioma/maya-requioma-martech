@@ -37,5 +37,5 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
  * Generate JWT token for a user. Just a simple token generation
  */
 export const generateToken = (userId: string): string => {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '24h' });
+  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: '24h', algorithm: 'HS256' });
 };

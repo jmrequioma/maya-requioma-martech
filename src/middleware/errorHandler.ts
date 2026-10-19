@@ -1,9 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 
-/**
- * Global error handler middleware
- * Should be added as the last middleware in the app
- */
 export const errorHandler = (
   error: Error,
   req: Request,
@@ -16,6 +12,15 @@ export const errorHandler = (
     method: req.method,
     path: req.path,
   });
+
+  // Handle JSON parsing errors
+  if (error instanceof SyntaxError && 'body' in error) {
+    res.status(400).json({
+      error: 'Invalid JSON',
+      message: 'Request body must be valid JSON with double-quoted keys and values',
+    });
+    return;
+  }
 
   res.status(500).json({
     error: 'Internal server error',

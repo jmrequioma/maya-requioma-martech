@@ -137,9 +137,12 @@ export async function getLimitUsage(userId: string): Promise<LimitUsage> {
 }
 
 /**
- * Transfer money from sender to recipient
+ * Transfer money from sender to recipient (ADMIN)
  */
-export async function transferMoney(request: TransferRequest): Promise<TransferResponse> {
+export async function adminTransferMoney(
+  request: TransferRequest,
+  idempotencyKey: string
+): Promise<TransferResponse> {
   const { senderId, recipientId, amount } = request;
 
   // Validate amount
@@ -176,81 +179,61 @@ export async function transferMoney(request: TransferRequest): Promise<TransferR
     };
   }
 
-  // Get sender's wallet
-  let senderWallet = await Wallet.findOne({ where: { userId: senderId } });
-  if (!senderWallet) {
-    return {
-      success: false,
-      error: 'Sender wallet not found',
-    };
-  }
-
-  // Check balance
-  if (parseFloat(senderWallet.balance.toString()) < amount) {
-    return {
-      success: false,
-      error: `Insufficient balance. Current balance: ₱${parseFloat(senderWallet.balance.toString()).toFixed(2)}`,
-    };
-  }
-
-  // Get user's limits
-  const { dailyLimit, monthlyLimit } = await getUserLimits(senderId);
-
-  // Get current spending
-  const dailySpent = await getDailySpent(senderId);
-  const monthlySpent = await getMonthlySpent(senderId);
-
-  // Check daily limit
-  if (dailySpent + amount > dailyLimit) {
-    const remaining = dailyLimit - dailySpent;
-    return {
-      success: false,
-      error: `Daily limit exceeded. Remaining today: ₱${remaining.toFixed(2)}`,
-    };
-  }
-
-  // Check monthly limit
-  if (monthlySpent + amount > monthlyLimit) {
-    const remaining = monthlyLimit - monthlySpent;
-    return {
-      success: false,
-      error: `Monthly limit exceeded. Remaining this month: ₱${remaining.toFixed(2)}`,
-    };
-  }
-
-  // Create transaction
   try {
-    const transaction = await Transaction.create({
-      senderId,
-      recipientId,
-      amount,
-      status: 'COMPLETED',
-    });
-
-    // Update sender's wallet
-    senderWallet.balance = parseFloat(senderWallet.balance.toString()) - amount;
-    senderWallet.totalSent = parseFloat(senderWallet.totalSent.toString()) + amount;
-    await senderWallet.save();
-
-    // Update recipient's wallet
-    let recipientWallet = await Wallet.findOne({
-      where: { userId: recipientId },
-    });
-    if (recipientWallet) {
-      recipientWallet.balance = parseFloat(recipientWallet.balance.toString()) + amount;
-      recipientWallet.totalReceived = parseFloat(recipientWallet.totalReceived.toString()) + amount;
-      await recipientWallet.save();
-    }
-
     return {
       success: true,
-      transaction: {
-        id: transaction.id,
-        senderId: transaction.senderId,
-        recipientId: transaction.recipientId,
-        amount: parseFloat(transaction.amount.toString()),
-        status: transaction.status,
-      },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: 'Failed to create transaction',
+    };
+  }
+}
+
+export async function userTransferMoney(
+  request: TransferRequest,
+  idempotencyKey: string
+): Promise<TransferResponse> {
+  const { senderId, recipientId, amount } = request;
+
+  // Validate amount
+  if (amount <= 0) {
+    return {
+      success: false,
+      error: 'Amount must be greater than 0',
+    };
+  }
+
+  // Check if sender exists
+  const sender = await User.findByPk(senderId);
+  if (!sender) {
+    return {
+      success: false,
+      error: 'Sender not found',
+    };
+  }
+
+  // Check if recipient exists
+  const recipient = await User.findByPk(recipientId);
+  if (!recipient) {
+    return {
+      success: false,
+      error: 'Recipient not found',
+    };
+  }
+
+  // Prevent self-transfer
+  if (senderId === recipientId) {
+    return {
+      success: false,
+      error: 'Cannot transfer to yourself',
+    };
+  }
+
+  try {
+    return {
+      success: true,
     };
   } catch (error) {
     return {

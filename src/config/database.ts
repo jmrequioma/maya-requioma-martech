@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize, Op } from 'sequelize';
 
 const sequelize = new Sequelize(
   process.env.DB_NAME || 'maya_martech',
@@ -12,4 +12,4 @@ const sequelize = new Sequelize(
   }
 );
 
-export default sequelize;
+export { sequelize, Op };

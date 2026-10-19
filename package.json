@@ -36,6 +36,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "date-fns": "^4.4.0",
     "date-fns-tz": "^3.2.0",
     "dotenv": "^18.0.8",
@@ -44,16 +45,16 @@
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.23.1",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.8"
+    "sequelize": "^6.37.8",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.6.0",
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.6.5",
     "@types/pg": "^8.23.1",
-    "@typescript-eslint/eslint-plugin": "^8.72.0",
-    "@typescript-eslint/parser": "^8.72.0",
     "@vitest/ui": "^5.0.5",
     "eslint": "^8.57.1",
     "husky": "^9.1.4",

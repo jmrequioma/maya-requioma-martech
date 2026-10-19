@@ -1,10 +1,11 @@
 import { DataTypes } from 'sequelize';
 import AuditedModel from './AuditedModel.js';
-import sequelize from '../config/database.js';
+import { sequelize } from '../config/database.js';
 
 class Role extends AuditedModel {
   declare id: string;
   declare name: string;
+  declare type: string;
 }
 
 Role.init(

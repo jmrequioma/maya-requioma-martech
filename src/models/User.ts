@@ -1,13 +1,15 @@
 import { DataTypes } from 'sequelize';
 import AuditedModel from './AuditedModel.js';
-import sequelize from '../config/database.js';
+import { sequelize } from '../config/database.js';
 
 class User extends AuditedModel {
   declare id: string;
-  declare email: string;
+  declare handleId: string;
+  declare password: string;
   declare firstName: string;
   declare middleName: string | null;
   declare lastName: string;
+  declare status: string;
 }
 
 User.init(
@@ -18,10 +20,17 @@ User.init(
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    email: {
+    handleId: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+    },
+    password: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
     },
     firstName: {
       type: DataTypes.STRING,

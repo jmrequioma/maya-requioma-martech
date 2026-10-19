@@ -1,5 +1,5 @@
 import express from 'express';
-import sequelize from './config/database.js';
+import { sequelize } from './config/database.js';
 import apiRouter from './routes/api.js';
 import { logger } from './middleware/logger.js';
 import { apiLimiter } from './middleware/rateLimiter.js';

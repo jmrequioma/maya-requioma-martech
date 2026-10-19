@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 import AuditedModel from './AuditedModel.js';
-import sequelize from '../config/database.js';
+import { sequelize } from '../config/database.js';
 
 class Wallet extends AuditedModel {
   declare id: string;

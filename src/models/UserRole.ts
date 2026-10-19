@@ -1,6 +1,6 @@
 import { DataTypes } from 'sequelize';
 import AuditedModel from './AuditedModel.js';
-import sequelize from '../config/database.js';
+import { sequelize } from '../config/database.js';
 
 class UserRole extends AuditedModel {
   declare id: string;

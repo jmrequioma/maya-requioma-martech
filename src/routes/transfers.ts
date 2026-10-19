@@ -1,11 +1,11 @@
 import { Router, Response } from 'express';
 import {
-  transferMoney,
   getLimitUsage,
   getTransactionHistory,
   getWallet,
   createWallet,
   updateUserLimits,
+  userTransferMoney,
 } from '../services/transferService.js';
 import { AuthRequest } from '../middleware/auth.js';
 import {
@@ -25,11 +25,14 @@ router.post(
     try {
       const { senderId, recipientId, amount } = req.body;
 
-      const result = await transferMoney({
-        senderId,
-        recipientId,
-        amount: parseFloat(amount),
-      });
+      const result = await userTransferMoney(
+        {
+          senderId,
+          recipientId,
+          amount: parseFloat(amount),
+        },
+        req.headers['idempotency-key'] as string
+      );
 
       if (result.success) {
         return res.status(201).json({

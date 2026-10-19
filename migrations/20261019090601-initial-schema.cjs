@@ -10,10 +10,17 @@ module.exports = {
         defaultValue: Sequelize.UUIDV4,
         primaryKey: true,
       },
-      email: {
+      handle_id: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true,
+      },
+      password: {
+        type: Sequelize.STRING(255),
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+        },
       },
       first_name: {
         type: Sequelize.STRING,
@@ -295,5 +302,5 @@ module.exports = {
     await queryInterface.dropTable('wallets');
     await queryInterface.dropTable('users');
     await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_transactions_status";');
-  }
+  },
 };
