@@ -1,18 +1,18 @@
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes } from 'sequelize';
+import AuditedModel from './AuditedModel.js';
 import sequelize from '../config/database.js';
 
-class User extends Model {
+class User extends AuditedModel {
   declare id: string;
   declare email: string;
   declare firstName: string;
   declare middleName: string | null;
   declare lastName: string;
-  declare readonly createdAt: Date;
-  declare readonly updatedAt: Date;
 }
 
 User.init(
   {
+    ...User.auditAttributes(),
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -36,16 +36,9 @@ User.init(
       allowNull: false,
     },
     status: {
-        type: DataTypes.STRING(4),
-        allowNull: true,
-    },
-    createdBy: {
-      type: DataTypes.STRING(320),
+      type: DataTypes.STRING(4),
       allowNull: false,
-    },
-    updatedBy: {
-      type: DataTypes.STRING(320),
-      allowNull: false,
+      defaultValue: 'A',
     },
   },
   {

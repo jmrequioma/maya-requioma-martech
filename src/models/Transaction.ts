@@ -1,19 +1,19 @@
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes } from 'sequelize';
+import AuditedModel from './AuditedModel.js';
 import sequelize from '../config/database.js';
 
-class Transaction extends Model {
+class Transaction extends AuditedModel {
   declare id: string;
   declare senderId: string;
   declare recipientId: string;
   declare amount: number;
   declare status: 'COMPLETED' | 'FAILED';
   declare failureReason?: string;
-  declare readonly createdAt: Date;
-  declare readonly updatedAt: Date;
 }
 
 Transaction.init(
   {
+    ...Transaction.auditAttributes(),
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -50,14 +50,6 @@ Transaction.init(
     failureReason: {
       type: DataTypes.STRING,
       allowNull: true,
-    },
-    createdBy: {
-      type: DataTypes.STRING(320),
-      allowNull: false,
-    },
-    updatedBy: {
-      type: DataTypes.STRING(320),
-      allowNull: false,
     },
   },
   {

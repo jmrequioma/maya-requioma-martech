@@ -1,17 +1,17 @@
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes } from 'sequelize';
+import AuditedModel from './AuditedModel.js';
 import sequelize from '../config/database.js';
 
-class UserTransferLimit extends Model {
+class UserTransferLimit extends AuditedModel {
   declare id: string;
   declare userId: string;
   declare dailyLimit: number;
   declare monthlyLimit: number;
-  declare readonly createdAt: Date;
-  declare readonly updatedAt: Date;
 }
 
 UserTransferLimit.init(
   {
+    ...UserTransferLimit.auditAttributes(),
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -41,14 +41,6 @@ UserTransferLimit.init(
       validate: {
         min: 0,
       },
-    },
-    createdBy: {
-      type: DataTypes.STRING(320),
-      allowNull: false,
-    },
-    updatedBy: {
-      type: DataTypes.STRING(320),
-      allowNull: false,
     },
   },
   {

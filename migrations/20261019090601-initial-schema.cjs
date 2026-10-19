@@ -27,6 +27,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      status: {
+        type: Sequelize.STRING(4),
+        allowNull: false,
+        defaultValue: 'A',
+      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -279,5 +284,6 @@ module.exports = {
     await queryInterface.dropTable('transactions');
     await queryInterface.dropTable('wallets');
     await queryInterface.dropTable('users');
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_transactions_status";');
   }
 };

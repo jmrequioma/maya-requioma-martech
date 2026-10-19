@@ -58,7 +58,7 @@ async function getDailySpent(userId: string): Promise<number> {
     attributes: [['SUM(amount)', 'total']],
     where: {
       senderId: userId,
-      status: 'completed',
+      status: 'COMPLETED',
       createdAt: {
         [Op.between]: [startOfDay, endOfDay],
       },
@@ -80,7 +80,7 @@ async function getMonthlySpent(userId: string): Promise<number> {
     attributes: [['SUM(amount)', 'total']],
     where: {
       senderId: userId,
-      status: 'completed',
+      status: 'COMPLETED',
       createdAt: {
         [Op.between]: [startOfMonth, endOfMonth],
       },
@@ -226,7 +226,7 @@ export async function transferMoney(
       senderId,
       recipientId,
       amount,
-      status: 'completed',
+      status: 'COMPLETED',
     });
 
     // Update sender's wallet
