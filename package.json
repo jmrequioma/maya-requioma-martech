@@ -19,16 +19,34 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc && node dist/index.js",
+    "dev": "nodemon --watch src --ext ts,js --exec 'tsc && node' dist/index.js",
     "start": "node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "migrate": "sequelize-cli db:migrate --config config/config.cjs",
+    "migrate:undo": "sequelize-cli db:migrate:undo --config config/config.cjs",
+    "migrate:undoAll": "sequelize-cli db:migrate:undo:all --config config/config.cjs",
+    "seed": "sequelize-cli db:seed:all --config config/config.cjs",
+    "seed:undo": "sequelize-cli db:seed:undo --config config/config.cjs",
+    "seed:undoAll": "sequelize-cli db:seed:undo:all --config config/config.cjs"
   },
   "dependencies": {
-    "express": "^5.3.0"
+    "date-fns": "^4.4.0",
+    "date-fns-tz": "^3.2.0",
+    "dotenv": "^18.0.8",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.23.1",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.8"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.6.5",
+    "@types/pg": "^8.23.1",
+    "nodemon": "^3.1.4",
+    "sequelize-cli": "^6.6.5",
     "typescript": "^7.0.2"
   }
 }
