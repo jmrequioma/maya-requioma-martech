@@ -32,6 +32,14 @@ UserRole.init(
         key: 'id',
       },
     },
+    createdBy: {
+      type: DataTypes.STRING(320),
+      allowNull: false,
+    },
+    updatedBy: {
+      type: DataTypes.STRING(320),
+      allowNull: false,
+    },
   },
   {
     sequelize,

@@ -30,9 +30,18 @@ module.exports = {
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
+        defaultValue: Sequelize.fn('now'),
       },
       updated_at: {
         type: Sequelize.DATE,
+        allowNull: true,
+      },
+      created_by: {
+        type: Sequelize.STRING(320),
+        allowNull: false,
+      },
+      updated_by: {
+        type: Sequelize.STRING(320),
         allowNull: false,
       },
     });
@@ -71,9 +80,18 @@ module.exports = {
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
+        defaultValue: Sequelize.fn('now'),
       },
       updated_at: {
         type: Sequelize.DATE,
+        allowNull: true,
+      },
+      created_by: {
+        type: Sequelize.STRING(320),
+        allowNull: false,
+      },
+      updated_by: {
+        type: Sequelize.STRING(320),
         allowNull: false,
       },
     });
@@ -117,9 +135,18 @@ module.exports = {
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
+        defaultValue: Sequelize.fn('now'),
       },
       updated_at: {
         type: Sequelize.DATE,
+        allowNull: true,
+      },
+      created_by: {
+        type: Sequelize.STRING(320),
+        allowNull: false,
+      },
+      updated_by: {
+        type: Sequelize.STRING(320),
         allowNull: false,
       },
     });
@@ -153,9 +180,18 @@ module.exports = {
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
+        defaultValue: Sequelize.fn('now'),
       },
       updated_at: {
         type: Sequelize.DATE,
+        allowNull: true,
+      },
+      created_by: {
+        type: Sequelize.STRING(320),
+        allowNull: false,
+      },
+      updated_by: {
+        type: Sequelize.STRING(320),
         allowNull: false,
       },
     });
@@ -183,9 +219,18 @@ module.exports = {
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
+        defaultValue: Sequelize.fn('now'),
       },
       updated_at: {
         type: Sequelize.DATE,
+        allowNull: true,
+      },
+      created_by: {
+        type: Sequelize.STRING(320),
+        allowNull: false,
+      },
+      updated_by: {
+        type: Sequelize.STRING(320),
         allowNull: false,
       },
     });
@@ -210,9 +255,18 @@ module.exports = {
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
+        defaultValue: Sequelize.fn('now'),
       },
       updated_at: {
         type: Sequelize.DATE,
+        allowNull: true,
+      },
+      created_by: {
+        type: Sequelize.STRING(320),
+        allowNull: false,
+      },
+      updated_by: {
+        type: Sequelize.STRING(320),
         allowNull: false,
       },
     });

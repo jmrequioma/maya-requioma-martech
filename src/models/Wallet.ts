@@ -45,6 +45,14 @@ Wallet.init(
       allowNull: false,
       defaultValue: 0,
     },
+    createdBy: {
+      type: DataTypes.STRING(320),
+      allowNull: false,
+    },
+    updatedBy: {
+      type: DataTypes.STRING(320),
+      allowNull: false,
+    },
   },
   {
     sequelize,

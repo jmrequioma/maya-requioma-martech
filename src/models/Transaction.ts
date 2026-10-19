@@ -51,6 +51,14 @@ Transaction.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    createdBy: {
+      type: DataTypes.STRING(320),
+      allowNull: false,
+    },
+    updatedBy: {
+      type: DataTypes.STRING(320),
+      allowNull: false,
+    },
   },
   {
     sequelize,

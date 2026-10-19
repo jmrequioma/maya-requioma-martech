@@ -29,7 +29,11 @@ Role.init(
         notEmpty: true,
       },
     },
-    created_by: {
+    createdBy: {
+      type: DataTypes.STRING(320),
+      allowNull: false,
+    },
+    updatedBy: {
       type: DataTypes.STRING(320),
       allowNull: false,
     },

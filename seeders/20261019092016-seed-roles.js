@@ -5,12 +5,9 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     await queryInterface.bulkInsert('roles', [
       {
-        id_: Sequelize.literal('gen_random_uuid()'),
-        role_type: 'XAD',
-        role_name: 'Super Admin',
-        status: 'A',
-        remarks: 'Super Admin role',
-        created_at: new Date(),
+        id: Sequelize.literal('gen_random_uuid()'),
+        type: 'XAD',
+        name: 'Admin',
         created_by: 'system',
       },
       {
@@ -19,7 +16,6 @@ module.exports = {
         role_name: 'Admin',
         status: 'A',
         remarks: 'Admin role',
-        created_at: new Date(),
         created_by: 'system',
       },
       {
