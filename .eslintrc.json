@@ -11,7 +11,30 @@
     "sourceType": "module"
   },
   "rules": {
-    "no-unused-vars": "warn"
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "no-var": "error",
+    "prefer-const": "error",
+    "prefer-arrow-callback": "warn",
+    "eqeqeq": ["error", "always"],
+    "no-implicit-coercion": "error",
+    "no-multi-spaces": "error",
+    "no-multiple-empty-lines": ["error", { "max": 2 }],
+    "no-trailing-spaces": "error",
+    "comma-dangle": ["error", "always-multiline"],
+    "semi": ["error", "always"],
+    "quotes": ["error", "single", { "avoidEscape": true }],
+    "indent": ["error", 2],
+    "keyword-spacing": "error",
+    "space-before-blocks": "error",
+    "object-curly-spacing": ["error", "always"],
+    "array-bracket-spacing": ["error", "never"],
+    "computed-property-spacing": ["error", "never"],
+    "arrow-spacing": "error",
+    "no-else-return": "warn",
+    "prefer-template": "warn",
+    "no-param-reassign": "warn"
   }
 }
+
 

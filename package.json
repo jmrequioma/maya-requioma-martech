@@ -26,6 +26,7 @@
     "test:ui": "vitest --ui",
     "lint": "eslint . --ext .ts,.js",
     "lint:fix": "eslint . --ext .ts,.js --fix",
+    "format": "prettier --write 'src/**/*.{js,ts}' && npm run lint:fix",
     "migrate": "sequelize-cli db:migrate --config config/config.cjs",
     "migrate:undo": "sequelize-cli db:migrate:undo --config config/config.cjs",
     "migrate:undoAll": "sequelize-cli db:migrate:undo:all --config config/config.cjs",

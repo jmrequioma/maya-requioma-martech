@@ -55,9 +55,8 @@ export const getEndOfMonthManila = (date: Date = new Date()): Date => {
 /**
  * Format date in Manila timezone
  */
-export const formatDateManila = (
-  date: Date,
-  formatStr: string = 'yyyy-MM-dd HH:mm:ss'
-): string => {
-  return format(toZonedTime(date, TIMEZONE), formatStr, { timeZone: TIMEZONE });
+export const formatDateManila = (date: Date, formatStr: string = 'yyyy-MM-dd HH:mm:ss'): string => {
+  return format(toZonedTime(date, TIMEZONE), formatStr, {
+    timeZone: TIMEZONE,
+  });
 };

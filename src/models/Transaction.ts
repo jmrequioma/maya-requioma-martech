@@ -68,7 +68,7 @@ Transaction.init(
         fields: ['senderId', 'idempotencyKey'],
       },
     ],
-  },
+  }
 );
 
 export default Transaction;

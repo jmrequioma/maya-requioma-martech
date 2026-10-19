@@ -26,11 +26,7 @@ export const errorHandler = (
 /**
  * 404 Not Found handler
  */
-export const notFoundHandler = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void => {
+export const notFoundHandler = (req: Request, res: Response, next: NextFunction): void => {
   res.status(404).json({
     error: 'Not found',
     message: `Endpoint ${req.method} ${req.path} does not exist`,

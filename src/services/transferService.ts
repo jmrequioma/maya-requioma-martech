@@ -54,7 +54,7 @@ async function getDailySpent(userId: string): Promise<number> {
   const startOfDay = getStartOfDayManila();
   const endOfDay = getEndOfDayManila();
 
-  const result = await Transaction.findOne({
+  const result = (await Transaction.findOne({
     attributes: [['SUM(amount)', 'total']],
     where: {
       senderId: userId,
@@ -64,7 +64,7 @@ async function getDailySpent(userId: string): Promise<number> {
       },
     },
     raw: true,
-  }) as any;
+  })) as any;
 
   return parseFloat(result?.total) || 0;
 }
@@ -76,7 +76,7 @@ async function getMonthlySpent(userId: string): Promise<number> {
   const startOfMonth = getStartOfMonthManila();
   const endOfMonth = getEndOfMonthManila();
 
-  const result = await Transaction.findOne({
+  const result = (await Transaction.findOne({
     attributes: [['SUM(amount)', 'total']],
     where: {
       senderId: userId,
@@ -86,7 +86,7 @@ async function getMonthlySpent(userId: string): Promise<number> {
       },
     },
     raw: true,
-  }) as any;
+  })) as any;
 
   return parseFloat(result?.total) || 0;
 }
@@ -139,9 +139,7 @@ export async function getLimitUsage(userId: string): Promise<LimitUsage> {
 /**
  * Transfer money from sender to recipient
  */
-export async function transferMoney(
-  request: TransferRequest
-): Promise<TransferResponse> {
+export async function transferMoney(request: TransferRequest): Promise<TransferResponse> {
   const { senderId, recipientId, amount } = request;
 
   // Validate amount
@@ -235,7 +233,9 @@ export async function transferMoney(
     await senderWallet.save();
 
     // Update recipient's wallet
-    let recipientWallet = await Wallet.findOne({ where: { userId: recipientId } });
+    let recipientWallet = await Wallet.findOne({
+      where: { userId: recipientId },
+    });
     if (recipientWallet) {
       recipientWallet.balance = parseFloat(recipientWallet.balance.toString()) + amount;
       recipientWallet.totalReceived = parseFloat(recipientWallet.totalReceived.toString()) + amount;
@@ -351,11 +351,7 @@ export async function getTransactionHistory(
 /**
  * Update transfer limits for a user
  */
-export async function updateUserLimits(
-  userId: string,
-  dailyLimit?: number,
-  monthlyLimit?: number
-) {
+export async function updateUserLimits(userId: string, dailyLimit?: number, monthlyLimit?: number) {
   try {
     let limits = await UserTransferLimit.findOne({ where: { userId } });
 

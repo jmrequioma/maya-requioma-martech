@@ -42,11 +42,7 @@ export const logger = (req: Request, res: Response, next: NextFunction): void =>
 /**
  * Error logger - logs errors with context
  */
-export const logError = (
-  error: Error,
-  req: Request,
-  context: string
-): void => {
+export const logError = (error: Error, req: Request, context: string): void => {
   console.error(`[ERROR] ${context}`, {
     message: error.message,
     stack: error.stack,

@@ -16,7 +16,12 @@ router.post('/token', authLimiter, (req: Request, res: Response) => {
     if (!userId || typeof userId !== 'string') {
       res.status(400).json({
         error: 'Validation failed',
-        details: [{ field: 'userId', message: 'userId is required and must be a string' }],
+        details: [
+          {
+            field: 'userId',
+            message: 'userId is required and must be a string',
+          },
+        ],
       });
       return;
     }
