@@ -124,6 +124,10 @@ module.exports = {
           key: 'id',
         },
       },
+      idempotency_key: {
+        type: Sequelize.UUID,
+        allowNull: false,
+      },
       amount: {
         type: Sequelize.DECIMAL(15, 2),
         allowNull: false,
@@ -274,6 +278,12 @@ module.exports = {
         type: Sequelize.STRING(320),
         allowNull: false,
       },
+    });
+
+    // Add unique index for sender and idempotency key
+    await queryInterface.addIndex('transactions', {
+      fields: ['sender_id', 'idempotency_key'],
+      unique: true,
     });
   },
 

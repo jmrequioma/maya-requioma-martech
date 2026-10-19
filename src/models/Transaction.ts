@@ -9,6 +9,7 @@ class Transaction extends AuditedModel {
   declare amount: number;
   declare status: 'COMPLETED' | 'FAILED';
   declare failureReason?: string;
+  declare idempotencyKey: string;
 }
 
 Transaction.init(
@@ -51,13 +52,23 @@ Transaction.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    idempotencyKey: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
   },
   {
     sequelize,
     modelName: 'Transaction',
     tableName: 'transactions',
     underscored: true,
-  }
+    indexes: [
+      {
+        unique: true,
+        fields: ['senderId', 'idempotencyKey'],
+      },
+    ],
+  },
 );
 
 export default Transaction;
