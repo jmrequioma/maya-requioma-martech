@@ -3,7 +3,6 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    // faker v10 is ESM-only, so it must be loaded via dynamic import from this CommonJS file.
     const { faker } = await import('@faker-js/faker');
 
     await queryInterface.bulkInsert('users', [
