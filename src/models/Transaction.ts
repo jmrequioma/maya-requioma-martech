@@ -6,7 +6,7 @@ class Transaction extends Model {
   declare senderId: string;
   declare recipientId: string;
   declare amount: number;
-  declare status: 'completed' | 'failed';
+  declare status: 'COMPLETED' | 'FAILED';
   declare failureReason?: string;
   declare readonly createdAt: Date;
   declare readonly updatedAt: Date;
@@ -43,8 +43,8 @@ Transaction.init(
       },
     },
     status: {
-      type: DataTypes.ENUM('completed', 'failed'),
-      defaultValue: 'completed',
+      type: DataTypes.ENUM('COMPLETED', 'FAILED'),
+      defaultValue: 'COMPLETED',
       allowNull: false,
     },
     failureReason: {

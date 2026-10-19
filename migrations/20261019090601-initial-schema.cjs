@@ -124,8 +124,8 @@ module.exports = {
         allowNull: false,
       },
       status: {
-        type: Sequelize.ENUM('completed', 'failed'),
-        defaultValue: 'completed',
+        type: Sequelize.ENUM('COMPLETED', 'FAILED'),
+        defaultValue: 'COMPLETED',
         allowNull: false,
       },
       failure_reason: {
