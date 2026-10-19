@@ -12,7 +12,7 @@ A TypeScript + Express.js server with Sequelize ORM and PostgreSQL, containerize
 
 1. **Start the services:**
    ```bash
-   docker-compose up --build
+   docker compose up --build
    ```
 
    This will:
@@ -36,12 +36,12 @@ A TypeScript + Express.js server with Sequelize ORM and PostgreSQL, containerize
 
 3. **Stop the services:**
    ```bash
-   docker-compose down
+   docker compose down
    ```
 
    To also remove the database volume:
    ```bash
-   docker-compose down -v
+   docker compose down -v
    ```
 
 ## Local Development (without Docker)
