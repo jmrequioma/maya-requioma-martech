@@ -117,7 +117,13 @@ The PostgreSQL container:
 
 ## Assumptions and Scope
 
-1. Basic authentication only for this app, log in, log out, refresh token functionalities not included
+1. Basic authentication only for this app, log out, refresh token functionalities not included
 2. Administrator role can perform CRUD operations for all users
 3. User role can ONLY perform CRUD operations for their own records
+4. Transaction lifecycle will only be COMPLETED and FAILED. Synchronous processing of transactions are being done.
+
+
+## Brief Notes before Production Launch
+[] Generate a separate JWT_SECRET_KEY for the production environment
+[] Generate a different password for the database in the production environment
 

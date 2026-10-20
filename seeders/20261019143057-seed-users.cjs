@@ -28,19 +28,32 @@ module.exports = {
         created_by: 'system',
         updated_by: 'system',
       },
+      {
+        id: Sequelize.literal('gen_random_uuid()'),
+        handle_id: faker.internet.email(),
+        password: hashedPassword,
+        first_name: faker.person.firstName(),
+        last_name: faker.person.lastName(),
+        status: 'A',
+        created_by: 'system',
+        updated_by: 'system',
+      },
+      {
+        id: Sequelize.literal('gen_random_uuid()'),
+        handle_id: faker.internet.email(),
+        password: hashedPassword,
+        first_name: faker.person.firstName(),
+        last_name: faker.person.lastName(),
+        status: 'A',
+        created_by: 'system',
+        updated_by: 'system',
+      },
     ], {});
   },
 
   async down (queryInterface, Sequelize) {
     await queryInterface.bulkDelete(
-      'users',
-      {
-        handle_id: [
-          'admin@example.com',
-          'user@example.com',
-        ],
-      },
-      {},
+      'users', null, {},
     );
   },
 };
