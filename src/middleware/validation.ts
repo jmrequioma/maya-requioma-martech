@@ -65,3 +65,5 @@ export const validateWalletCreation = createValidationMiddleware(walletCreationS
  * Validate query parameters for pagination
  */
 export const validatePagination = createValidationMiddleware(paginationSchema);
+
+export const validateCreateWallet = createValidationMiddleware(walletCreationSchema);
