@@ -5,6 +5,7 @@ import { transferSchema, adminTransferSchema } from '../schemas/transferSchema.j
 import { walletCreationSchema } from '../schemas/walletSchema.js';
 import { paginationSchema } from '../schemas/paginationSchema.js';
 import { updateLimitsSchema } from '../schemas/limitsSchema.js';
+import { registerSchema } from '../schemas/registerSchema.js';
 
 export interface ValidationError {
   field: string;
@@ -46,6 +47,7 @@ const createValidationMiddleware = (schema: z.ZodSchema) => {
  * Validate login request
  */
 export const validateLogin = createValidationMiddleware(loginSchema);
+export const validateRegister = createValidationMiddleware(registerSchema);
 
 /**
  * Validate transfer request body

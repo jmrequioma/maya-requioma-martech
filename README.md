@@ -39,8 +39,48 @@ A TypeScript + Express.js server with Sequelize ORM and PostgreSQL, containerize
      "message": "Send Money Limits Module is running"
    }
    ```
+3. **Main APIs:**
+- Registering a user
+```
+curl -X 'POST' \
+  'http://localhost:3000/api/auth/register' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "handleId": "user1@example.com",
+  "password": "password123",
+  "firstName": "John",
+  "lastName": "Doe"
+}'
+```
 
-3. **Stop the services:**
+- Logging in to authenticate a user
+```
+curl -X 'POST' \
+  'http://localhost:3000/api/auth/login' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "handleId": "user@example.com",
+  "password": "Password!23"
+}'
+```
+
+- Sending money
+```
+curl -X 'POST' \
+  'http://localhost:3000/api/v1/transfers' \
+  -H 'accept: */*' \
+  -H 'idempotency-key: 6fb45a50-0be4-41e3-944b-641338e93d5b' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1YzFjYWEyZi04NjJmLTQ2YTgtYTM0OS1lZmU5NzQyN2ExMjkiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNzkyNTE3ODE0LCJleHAiOjE3OTI2MDQyMTR9.xpf9lhtR7--26DUnxZpxML6TGsDof2jXcZ5tb5cqviA' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "recipientId": "b8c41e14-4795-4b2d-90d4-f11ecf2e5e5f",
+  "amount": 100.5
+}'
+```
+
+4. **Stop the services:**
    ```bash
    docker compose down
    ```
