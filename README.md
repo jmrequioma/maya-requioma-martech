@@ -2,16 +2,17 @@
 
 A TypeScript + Express.js server with Sequelize ORM and PostgreSQL, containerized with Docker.
 
+## Architectural Design
+
+<img src="martech.jpg" alt="Design" />
+
+## API Documentation
+- [Swagger URL](http://localhost:3000/api-docs)
 ## Quick Start with Docker
 
 ### Prerequisites
 - Docker
 - Docker Compose
-
-### Architectural Design
-
-<img src="martech.jpg" alt="Design" />
-
 
 ### Running the Application
 
@@ -136,7 +137,6 @@ The PostgreSQL container:
 3. User role can ONLY perform CRUD operations for their own records
 4. Transaction lifecycle will only be COMPLETED and FAILED. Synchronous processing of transactions are being done and it is an atomic transaction in the database.
 5. A user can only have one wallet. The API for creating a wallet fails when a user already has an existing one.
-6. 
 
 ## Brief Notes before Production Launch
 - [ ] Generate a separate `JWT_SECRET` for the production environment
