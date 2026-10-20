@@ -68,7 +68,15 @@ A TypeScript + Express.js server with Sequelize ORM and PostgreSQL, containerize
    NODE_ENV=development
    ```
 
-3. **Build and run:**
+3. **Run migrations and seeders:**
+  ```
+  npm run migrate
+  npm run seed
+  ```
+
+  Seeders will generate an admin user and multiple users with wallets. See [seeders folder](seeders/)
+
+4. **Build and run:**
    ```bash
    npm run dev
    ```
@@ -126,5 +134,5 @@ The PostgreSQL container:
 ## Brief Notes before Production Launch
 - [ ] Generate a separate `JWT_SECRET` for the production environment
 - [ ] Generate a different password for the database in the production environment
-- [ ] Remove hardcoded password for admin users in the seeders
+- [ ] Remove hardcoded password for users in the seeders
 
