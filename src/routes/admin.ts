@@ -138,7 +138,7 @@ router.get('/transfers/history/:userId', validatePagination, getAdminTransaction
  * @swagger
  * /api/v1/admin/limits/{userId}:
  *   get:
- *     summary: Get any user's transfer limits and usage (ADMIN)
+ *     summary: Get any user's transfer limits and usage
  *     description: Retrieve the current transfer limits and usage for a specified user
  *     tags:
  *       - Admin
@@ -188,7 +188,7 @@ router.get('/transfers/history/:userId', validatePagination, getAdminTransaction
  *       500:
  *         description: Internal server error
  *   put:
- *     summary: Update any user's transfer limits (ADMIN)
+ *     summary: Update any user's transfer limits
  *     description: Update the daily and/or monthly transfer limits for a specified user
  *     tags:
  *       - Admin

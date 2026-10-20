@@ -322,7 +322,7 @@ export async function userTransferMoney(req: AuthRequest, res: Response) {
 }
 
 /**
- * Transfer money from sender to recipient (ADMIN)
+ * Transfer money from sender to recipient
  */
 export async function adminTransferMoney(req: AuthRequest, res: Response) {
   try {
@@ -404,7 +404,7 @@ export async function getUserWallet(req: AuthRequest, res: Response) {
 }
 
 /**
- * Get any user's wallet (ADMIN)
+ * Get any user's wallet
  */
 export async function getAdminWallet(req: AuthRequest, res: Response) {
   try {
@@ -535,7 +535,7 @@ export async function getUserTransactionHistory(req: AuthRequest, res: Response)
 }
 
 /**
- * Get transaction history for any user (ADMIN)
+ * Get transaction history for any user
  */
 export async function getAdminTransactionHistory(req: AuthRequest, res: Response) {
   try {
@@ -600,7 +600,7 @@ export async function getUserLimits(req: AuthRequest, res: Response) {
 }
 
 /**
- * Get any user's transfer limits and usage (ADMIN)
+ * Get any user's transfer limits and usage
  */
 export async function getAdminLimits(req: AuthRequest, res: Response) {
   try {
@@ -694,7 +694,7 @@ export async function updateUserLimits(req: AuthRequest, res: Response) {
 }
 
 /**
- * Update any user's transfer limits (ADMIN)
+ * Update any user's transfer limits
  */
 export async function updateAdminLimits(req: AuthRequest, res: Response) {
   try {

@@ -264,7 +264,7 @@ router.get('/wallet', getUserWallet);
  * @swagger
  * /api/v1/wallet/{userId}:
  *   get:
- *     summary: Get any user's wallet (ADMIN)
+ *     summary: Get any user's wallet
  *     description: Retrieve wallet information for a specified user
  *     tags:
  *       - Wallet
