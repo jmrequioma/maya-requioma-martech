@@ -40,6 +40,7 @@ A TypeScript + Express.js server with Sequelize ORM and PostgreSQL, containerize
    }
    ```
 3. **Main APIs:**
+
 - Registering a user
 ```
 curl -X 'POST' \
@@ -72,12 +73,28 @@ curl -X 'POST' \
   'http://localhost:3000/api/v1/transfers' \
   -H 'accept: */*' \
   -H 'idempotency-key: 6fb45a50-0be4-41e3-944b-641338e93d5b' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1YzFjYWEyZi04NjJmLTQ2YTgtYTM0OS1lZmU5NzQyN2ExMjkiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNzkyNTE3ODE0LCJleHAiOjE3OTI2MDQyMTR9.xpf9lhtR7--26DUnxZpxML6TGsDof2jXcZ5tb5cqviA' \
+  -H 'Authorization: Bearer xxx' \
   -H 'Content-Type: application/json' \
   -d '{
   "recipientId": "b8c41e14-4795-4b2d-90d4-f11ecf2e5e5f",
   "amount": 100.5
 }'
+```
+
+- Inspecting user's limits
+```
+curl -X 'GET' \
+  'http://localhost:3000/api/v1/limits' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer xxx'
+```
+
+- Viewing a user's transaction history
+```
+curl -X 'GET' \
+  'http://localhost:3000/api/v1/transfers/history?limit=50&offset=0' \
+  -H 'accept: */*' \
+  -H 'Authorization: Bearer xxx'
 ```
 
 4. **Stop the services:**
