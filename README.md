@@ -8,6 +8,9 @@ A TypeScript + Express.js server with Sequelize ORM and PostgreSQL, containerize
 - Docker
 - Docker Compose
 
+### Architectural Design
+
+
 ### Running the Application
 
 1. **Start the services:**

@@ -515,18 +515,6 @@ async function updateLimits(
     });
   }
 
-  if (dailyLimit !== undefined && (typeof dailyLimit !== 'number' || dailyLimit <= 0)) {
-    return res.status(400).json({
-      error: 'dailyLimit must be a positive number',
-    });
-  }
-
-  if (monthlyLimit !== undefined && (typeof monthlyLimit !== 'number' || monthlyLimit <= 0)) {
-    return res.status(400).json({
-      error: 'monthlyLimit must be a positive number',
-    });
-  }
-
   try {
     let limits = await UserTransferLimit.findOne({ where: { userId } });
 
@@ -535,10 +523,13 @@ async function updateLimits(
         userId,
         dailyLimit: dailyLimit || DEFAULT_DAILY_LIMIT,
         monthlyLimit: monthlyLimit || DEFAULT_MONTHLY_LIMIT,
+        createdBy: userId,
+        updatedBy: userId,
       });
     } else {
       if (dailyLimit !== undefined) limits.dailyLimit = dailyLimit;
       if (monthlyLimit !== undefined) limits.monthlyLimit = monthlyLimit;
+      limits.updatedBy = userId;
       await limits.save();
     }
 

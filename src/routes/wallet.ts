@@ -1,6 +1,11 @@
 import { Router } from 'express';
-import { getUserWallet, createUserWallet } from '../services/walletService.js';
-import { validateCreateWallet } from '../middleware/validation.js';
+import {
+  getUserWallet,
+  getAdminWallet,
+  createUserWallet,
+  createAdminWallet,
+} from '../services/walletService.js';
+import { validateWalletCreation } from '../middleware/validation.js';
 
 const router = Router();
 
@@ -36,10 +41,9 @@ const router = Router();
  *         description: Wallet not found
  *       500:
  *         description: Internal server error
- *
  *   post:
- *     summary: Create a new wallet for the authenticated user
- *     description: Create a wallet with an optional initial balance for the authenticated user
+ *     summary: Create wallet for authenticated user
+ *     description: Create a new wallet for the authenticated user
  *     tags:
  *       - Wallet
  *     security:
@@ -53,7 +57,7 @@ const router = Router();
  *             properties:
  *               initialBalance:
  *                 type: number
- *                 minimum: 0
+ *                 default: 0
  *     responses:
  *       201:
  *         description: Wallet created successfully
@@ -62,18 +66,20 @@ const router = Router();
  *             schema:
  *               type: object
  *               properties:
+ *                 id:
+ *                   type: string
  *                 userId:
  *                   type: string
  *                 balance:
  *                   type: number
  *       400:
- *         description: Validation failed
+ *         description: Invalid wallet data
  *       401:
  *         description: Unauthorized
  *       500:
  *         description: Internal server error
  */
 router.get('/wallet', getUserWallet);
-router.post('/wallet', validateCreateWallet, createUserWallet);
+router.post('/wallet', validateWalletCreation, createUserWallet);
 
 export default router;

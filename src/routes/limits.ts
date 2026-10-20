@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { getUserLimits, updateUserLimits } from '../services/transferService.js';
+import { validateUpdateLimits } from '../middleware/validation.js';
 
 const router = Router();
 
@@ -91,4 +92,6 @@ const router = Router();
  *         description: Internal server error
  */
 router.get('/limits', getUserLimits);
-router.put('/limits', updateUserLimits);
+router.put('/limits', validateUpdateLimits, updateUserLimits);
+
+export default router;

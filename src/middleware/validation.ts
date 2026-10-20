@@ -4,6 +4,7 @@ import { loginSchema } from '../schemas/loginSchema.js';
 import { transferSchema, adminTransferSchema } from '../schemas/transferSchema.js';
 import { walletCreationSchema } from '../schemas/walletSchema.js';
 import { paginationSchema } from '../schemas/paginationSchema.js';
+import { updateLimitsSchema } from '../schemas/limitsSchema.js';
 
 export interface ValidationError {
   field: string;
@@ -65,5 +66,10 @@ export const validateWalletCreation = createValidationMiddleware(walletCreationS
  * Validate query parameters for pagination
  */
 export const validatePagination = createValidationMiddleware(paginationSchema);
+
+/**
+ * Validate limits update request
+ */
+export const validateUpdateLimits = createValidationMiddleware(updateLimitsSchema);
 
 export const validateCreateWallet = createValidationMiddleware(walletCreationSchema);
