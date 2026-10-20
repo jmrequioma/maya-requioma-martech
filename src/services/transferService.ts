@@ -123,7 +123,7 @@ export async function getLimitUsage(userId: string): Promise<LimitUsage> {
 /**
  * Internal transfer execution logic with atomic transaction and locking
  */
-async function executeTransfer(
+export async function executeTransfer(
   senderId: string,
   recipientId: string,
   amount: number,
@@ -410,36 +410,110 @@ export async function createWallet(userId: string, initialBalance: number = 0) {
 }
 
 /**
- * Get transaction history for a user
+ * Internal transaction history retrieval logic
  */
-export async function getTransactionHistory(
+async function fetchTransactionHistory(
   userId: string,
-  limit: number = 50,
-  offset: number = 0
+  limit: number,
+  offset: number,
+  res: Response
 ) {
-  const transactions = await Transaction.findAndCountAll({
-    where: {
-      [Op.or]: [{ senderId: userId }, { recipientId: userId }],
-    },
-    order: [['createdAt', 'DESC']],
-    limit,
-    offset,
-  });
+  if (!userId) {
+    return res.status(400).json({
+      error: 'Missing userId parameter',
+    });
+  }
 
-  return {
-    total: transactions.count,
-    limit,
-    offset,
-    transactions: transactions.rows.map((t) => ({
-      id: t.id,
-      senderId: t.senderId,
-      recipientId: t.recipientId,
-      amount: parseFloat(t.amount.toString()),
-      status: t.status,
-      failureReason: t.failureReason,
-      createdAt: t.createdAt,
-    })),
-  };
+  try {
+    const transactions = await Transaction.findAndCountAll({
+      where: {
+        [Op.or]: [{ senderId: userId }, { recipientId: userId }],
+      },
+      order: [['createdAt', 'DESC']],
+      limit,
+      offset,
+    });
+
+    return res.status(200).json({
+      total: transactions.count,
+      limit,
+      offset,
+      transactions: transactions.rows.map((t) => ({
+        id: t.id,
+        senderId: t.senderId,
+        recipientId: t.recipientId,
+        amount: parseFloat(t.amount.toString()),
+        status: t.status,
+        failureReason: t.failureReason,
+        createdAt: t.createdAt,
+      })),
+    });
+  } catch (error) {
+    console.error('Get transaction history error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
+  }
+}
+
+/**
+ * Get transaction history for authenticated user
+ */
+export async function getUserTransactionHistory(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.userId!;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const offset = parseInt(req.query.offset as string) || 0;
+
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Unauthorized: missing user ID',
+      });
+    }
+
+    return fetchTransactionHistory(userId, limit, offset, res);
+  } catch (error) {
+    console.error('Get user transaction history error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
+  }
+}
+
+/**
+ * Get transaction history for any user (ADMIN)
+ */
+export async function getAdminTransactionHistory(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.params.userId as string;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const offset = parseInt(req.query.offset as string) || 0;
+
+    return fetchTransactionHistory(userId, limit, offset, res);
+  } catch (error) {
+    console.error('Get admin transaction history error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
+  }
+}
+
+/**
+ * Get transaction history (DEPRECATED - use getUserTransactionHistory or getAdminTransactionHistory)
+ */
+export async function getTransactionHistory(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.params.userId as string;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const offset = parseInt(req.query.offset as string) || 0;
+
+    return fetchTransactionHistory(userId, limit, offset, res);
+  } catch (error) {
+    console.error('Transaction history error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
+  }
 }
 
 /**

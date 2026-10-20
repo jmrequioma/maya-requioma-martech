@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { validateAdminTransfer } from '../middleware/validation.js';
-import { adminTransferMoney } from '../services/transferService.js';
+import { validateAdminTransfer, validatePagination } from '../middleware/validation.js';
+import { adminTransferMoney, getAdminTransactionHistory } from '../services/transferService.js';
 
 const router = Router();
 
@@ -75,5 +75,59 @@ const router = Router();
  *         description: Internal server error
  */
 router.post('/transfers', validateAdminTransfer, adminTransferMoney);
+
+/**
+ * @swagger
+ * /api/v1/admin/transfers/history/{userId}:
+ *   get:
+ *     summary: Get transaction history for any user (ADMIN)
+ *     description: Retrieve paginated transaction history for a specified user
+ *     tags:
+ *       - Admin
+ *       - Transactions
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user ID
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *           maximum: 100
+ *         description: Number of records to return
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *         description: Number of records to skip
+ *     responses:
+ *       200:
+ *         description: Transaction history retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: integer
+ *                 limit:
+ *                   type: integer
+ *                 offset:
+ *                   type: integer
+ *                 transactions:
+ *                   type: array
+ *       400:
+ *         description: Missing userId parameter
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/transfers/history/:userId', validatePagination, getAdminTransactionHistory);
 
 export default router;

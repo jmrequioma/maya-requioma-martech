@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import {
   getLimitUsage,
   getTransactionHistory,
+  getUserTransactionHistory,
   getWallet,
   createWallet,
   updateUserLimits,
@@ -195,11 +196,59 @@ router.get('/limits/:userId', async (req: AuthRequest, res: Response) => {
 
 /**
  * @swagger
- * /api/v1/history/{userId}:
+ * /api/v1/transfers/history:
  *   get:
- *     summary: Get transaction history
- *     description: Retrieve paginated transaction history for a user
+ *     summary: Get authenticated user's transaction history
+ *     description: Retrieve paginated transaction history for the authenticated user
  *     tags:
+ *       - Transactions
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *           maximum: 100
+ *         description: Number of records to return
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *         description: Number of records to skip
+ *     responses:
+ *       200:
+ *         description: Transaction history retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: integer
+ *                 limit:
+ *                   type: integer
+ *                 offset:
+ *                   type: integer
+ *                 transactions:
+ *                   type: array
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/history', validatePagination, getUserTransactionHistory);
+
+/**
+ * @swagger
+ * /api/v1/admin/transfers/history/{userId}:
+ *   get:
+ *     summary: Get transaction history for any user (ADMIN)
+ *     description: Retrieve paginated transaction history for a specified user
+ *     tags:
+ *       - Admin
  *       - Transactions
  *     security:
  *       - bearerAuth: []
@@ -226,47 +275,52 @@ router.get('/limits/:userId', async (req: AuthRequest, res: Response) => {
  *     responses:
  *       200:
  *         description: Transaction history retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 userId:
- *                   type: string
- *                 transactions:
- *                   type: array
- *                   items:
- *                     type: object
+ *       400:
+ *         description: Missing userId parameter
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /api/v1/history/{userId}:
+ *   get:
+ *     summary: Get transaction history (DEPRECATED)
+ *     description: Use /api/v1/transfers/history or /api/v1/admin/transfers/history/{userId} instead
+ *     tags:
+ *       - Transactions
+ *     deprecated: true
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user ID
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *           maximum: 100
+ *         description: Number of records to return
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *         description: Number of records to skip
+ *     responses:
+ *       200:
+ *         description: Transaction history retrieved successfully
  *       400:
  *         description: Missing userId parameter or invalid pagination
  *       500:
  *         description: Internal server error
  */
-router.get('/history/:userId', validatePagination, async (req: AuthRequest, res: Response) => {
-  try {
-    const userId = req.params.userId as string;
-    const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
-    const offset = parseInt(req.query.offset as string) || 0;
-
-    if (!userId) {
-      return res.status(400).json({
-        error: 'Missing userId parameter',
-      });
-    }
-
-    const history = await getTransactionHistory(userId, limit, offset);
-
-    return res.status(200).json({
-      userId,
-      ...history,
-    });
-  } catch (error) {
-    console.error('History error:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
-    });
-  }
-});
+router.get('/history/:userId', validatePagination, getTransactionHistory);
 
 /**
  * @swagger
