@@ -124,7 +124,7 @@ The PostgreSQL container:
 
 
 ## Brief Notes before Production Launch
-- [ ] Generate a separate `JWT_SECRET_KEY` for the production environment
+- [ ] Generate a separate `JWT_SECRET` for the production environment
 - [ ] Generate a different password for the database in the production environment
 - [ ] Remove hardcoded password for admin users in the seeders
 
