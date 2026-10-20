@@ -35,8 +35,7 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - .:/app
-      - /app/node_modules
+      - ./src:/app/src
     command: npm run dev
 
 volumes:

@@ -13,7 +13,6 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(logger);
 app.use(apiLimiter);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Routes
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', message: 'Send Money Limits Module is running' });
