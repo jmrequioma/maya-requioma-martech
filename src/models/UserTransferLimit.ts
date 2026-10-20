@@ -1,12 +1,16 @@
 import { DataTypes } from 'sequelize';
 import AuditedModel from './AuditedModel.js';
 import { sequelize } from '../config/database.js';
+import type User from './User.js';
 
 class UserTransferLimit extends AuditedModel {
   declare id: string;
   declare userId: string;
   declare dailyLimit: number;
   declare monthlyLimit: number;
+
+  // Association declarations
+  declare user?: User;
 }
 
 UserTransferLimit.init(

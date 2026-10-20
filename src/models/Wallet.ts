@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import AuditedModel from './AuditedModel.js';
 import { sequelize } from '../config/database.js';
+import type User from './User.js';
 
 class Wallet extends AuditedModel {
   declare id: string;
@@ -8,6 +9,9 @@ class Wallet extends AuditedModel {
   declare balance: number;
   declare totalSent: number;
   declare totalReceived: number;
+
+  // Association declarations
+  declare user?: User;
 }
 
 Wallet.init(

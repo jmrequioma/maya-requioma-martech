@@ -345,12 +345,6 @@ export async function adminTransferMoney(req: AuthRequest, res: Response) {
   }
 }
 
-/**
- * Get wallet for a user
- */
-/**
- * Internal transaction history retrieval logic
- */
 async function fetchTransactionHistory(
   userId: string,
   limit: number,
@@ -368,6 +362,10 @@ async function fetchTransactionHistory(
       where: {
         [Op.or]: [{ senderId: userId }, { recipientId: userId }],
       },
+      include: [
+        { association: 'sender', attributes: ['id', 'handleId'] },
+        { association: 'recipient', attributes: ['id', 'handleId'] },
+      ],
       order: [['createdAt', 'DESC']],
       limit,
       offset,
@@ -379,8 +377,14 @@ async function fetchTransactionHistory(
       offset,
       transactions: transactions.rows.map((t) => ({
         id: t.id,
-        senderId: t.senderId,
-        recipientId: t.recipientId,
+        sender: {
+          id: t.senderId,
+          handleId: t.sender?.handleId,
+        },
+        recipient: {
+          id: t.recipientId,
+          handleId: t.recipient?.handleId,
+        },
         amount: parseFloat(t.amount.toString()),
         status: t.status,
         failureReason: t.failureReason,

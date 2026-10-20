@@ -1,6 +1,10 @@
 import { DataTypes } from 'sequelize';
 import AuditedModel from './AuditedModel.js';
 import { sequelize } from '../config/database.js';
+import type Wallet from './Wallet.js';
+import type UserTransferLimit from './UserTransferLimit.js';
+import type Transaction from './Transaction.js';
+import type UserRole from './UserRole.js';
 
 class User extends AuditedModel {
   declare id: string;
@@ -10,6 +14,13 @@ class User extends AuditedModel {
   declare middleName: string | null;
   declare lastName: string;
   declare status: string;
+
+  // Association declarations
+  declare wallet?: Wallet;
+  declare transferLimit?: UserTransferLimit;
+  declare sentTransactions?: Transaction[];
+  declare receivedTransactions?: Transaction[];
+  declare userRoles?: UserRole[];
 }
 
 User.init(

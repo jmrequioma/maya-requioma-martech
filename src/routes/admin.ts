@@ -133,6 +133,33 @@ router.post('/transfers', validateAdminTransfer, adminTransferMoney);
  *                   type: integer
  *                 transactions:
  *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       sender:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           handleId:
+ *                             type: string
+ *                       recipient:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           handleId:
+ *                             type: string
+ *                       amount:
+ *                         type: number
+ *                       status:
+ *                         type: string
+ *                       failureReason:
+ *                         type: string
+ *                       createdAt:
+ *                         type: string
  *       400:
  *         description: Missing userId parameter
  *       500:

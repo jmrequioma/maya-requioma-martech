@@ -1,5 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import { sequelize } from './config/database.js';
+import { setupAssociations } from './models/associations.js';
 import apiRouter from './routes/api.js';
 import { logger } from './middleware/logger.js';
 import { apiLimiter } from './middleware/rateLimiter.js';
@@ -36,6 +37,10 @@ const startServer = async () => {
   try {
     await sequelize.authenticate();
     console.log('Database connection established successfully.');
+
+    // Setup all model associations
+    setupAssociations();
+    console.log('Model associations initialized.');
 
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

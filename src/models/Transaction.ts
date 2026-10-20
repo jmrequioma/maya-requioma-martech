@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import AuditedModel from './AuditedModel.js';
 import { sequelize } from '../config/database.js';
+import type User from './User.js';
 
 class Transaction extends AuditedModel {
   declare id: string;
@@ -10,6 +11,10 @@ class Transaction extends AuditedModel {
   declare status: 'COMPLETED' | 'FAILED';
   declare failureReason?: string;
   declare idempotencyKey: string;
+
+  // Association declarations
+  declare sender?: User;
+  declare recipient?: User;
 }
 
 Transaction.init(

@@ -112,6 +112,33 @@ router.post('/transfers', validateTransfer, transferLimiter, userTransferMoney);
  *                   type: integer
  *                 transactions:
  *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       sender:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           handleId:
+ *                             type: string
+ *                       recipient:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           handleId:
+ *                             type: string
+ *                       amount:
+ *                         type: number
+ *                       status:
+ *                         type: string
+ *                       failureReason:
+ *                         type: string
+ *                       createdAt:
+ *                         type: string
  *       401:
  *         description: Unauthorized
  *       500:
