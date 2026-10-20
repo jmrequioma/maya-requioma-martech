@@ -5,6 +5,7 @@ import {
   getAdminTransactionHistory,
   getAdminLimits,
   updateAdminLimits,
+  getAdminWallet,
 } from '../services/transferService.js';
 
 const router = Router();
@@ -235,5 +236,82 @@ router.get('/transfers/history/:userId', validatePagination, getAdminTransaction
  */
 router.get('/limits/:userId', getAdminLimits);
 router.put('/limits/:userId', updateAdminLimits);
+
+/**
+ * @swagger
+ * /api/v1/wallet/{userId}:
+ *   get:
+ *     summary: Get any user's wallet
+ *     description: Retrieve wallet information for a specified user
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user ID
+ *     responses:
+ *       200:
+ *         description: Wallet retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userId:
+ *                   type: string
+ *                 balance:
+ *                   type: number
+ *                 totalSent:
+ *                   type: number
+ *                 totalReceived:
+ *                   type: number
+ *       400:
+ *         description: Missing userId parameter
+ *       404:
+ *         description: Wallet not found
+ *       500:
+ *         description: Internal server error
+ *   post:
+ *     summary: Create wallet for a user
+ *     description: Create a new wallet for a specified user
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               initialBalance:
+ *                 type: number
+ *                 default: 0
+ *     responses:
+ *       201:
+ *         description: Wallet created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 userId:
+ *                   type: string
+ *                 balance:
+ *                   type: number
+ *       400:
+ *         description: Invalid wallet data
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/wallet/:userId', getAdminWallet);
 
 export default router;
