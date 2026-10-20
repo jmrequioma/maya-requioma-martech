@@ -10,6 +10,8 @@ A TypeScript + Express.js server with Sequelize ORM and PostgreSQL, containerize
 
 ### Architectural Design
 
+<img src="martech.jpg" alt="Design" />
+
 
 ### Running the Application
 
