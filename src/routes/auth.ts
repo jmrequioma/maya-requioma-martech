@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authLimiter } from '../middleware/rateLimiter.js';
+import { validateLogin } from '../middleware/validation.js';
 import { login } from '../services/authService.js';
 
 const router = Router();
@@ -45,6 +46,6 @@ const router = Router();
  *       429:
  *         description: Too many login attempts
  */
-router.post('/login', authLimiter, login);
+router.post('/login', validateLogin, authLimiter, login);
 
 export default router;

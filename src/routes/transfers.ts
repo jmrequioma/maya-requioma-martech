@@ -22,7 +22,7 @@ const router = Router();
  * /api/v1/transfers:
  *   post:
  *     summary: Transfer money between users
- *     description: Transfer money from sender to recipient with idempotency support
+ *     description: Transfer money from sender to recipient with idempotency support. The sender is determined from the authenticated user's JWT token.
  *     tags:
  *       - Transfers
  *     security:
@@ -34,16 +34,13 @@ const router = Router();
  *           schema:
  *             type: object
  *             required:
- *               - senderId
  *               - recipientId
  *               - amount
  *             properties:
- *               senderId:
- *                 type: string
- *                 example: user-123
  *               recipientId:
  *                 type: string
- *                 example: user-456
+ *                 format: uuid
+ *                 example: 550e8400-e29b-41d4-a716-446655440000
  *               amount:
  *                 type: number
  *                 example: 100.50
@@ -65,49 +62,27 @@ const router = Router();
  *                   type: boolean
  *                 transaction:
  *                   type: object
+ *                    properties:
+ *                      id:
+ *                        type: string
+ *                      senderId:
+ *                        type: string
+ *                      recipientId:
+ *                        type: string
+ *                      amount:
+ *                        type: number
+ *                      status:
+ *                        type: string
  *       400:
  *         description: Invalid transfer data or limit exceeded
+ *       401:
+ *         description: Unauthorized
  *       429:
  *         description: Rate limit exceeded
  *       500:
  *         description: Internal server error
  */
-router.post(
-  '/transfers',
-  validateTransfer,
-  transferLimiter,
-  async (req: AuthRequest, res: Response) => {
-    try {
-      const { senderId, recipientId, amount } = req.body;
-
-      const result = await userTransferMoney(
-        {
-          senderId,
-          recipientId,
-          amount: parseFloat(amount),
-        },
-        req.headers['idempotency-key'] as string
-      );
-
-      if (result.success) {
-        return res.status(201).json({
-          success: true,
-          transaction: result.transaction,
-        });
-      } else {
-        return res.status(400).json({
-          success: false,
-          error: result.error,
-        });
-      }
-    } catch (error) {
-      console.error('Transfer error:', error);
-      return res.status(500).json({
-        error: 'Internal server error',
-      });
-    }
-  }
-);
+router.post('/transfers', validateTransfer, transferLimiter, userTransferMoney);
 
 /**
  * @swagger

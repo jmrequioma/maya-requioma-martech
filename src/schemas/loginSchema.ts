@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-const loginSchema = z.object({
-  handleId: z.string().min(1, 'Handle ID is required'),
-  password: z.string().min(1, 'Password is required'),
+export const loginSchema = z.object({
+  handleId: z.string().min(1, 'handleId is required'),
+  password: z.string().min(1, 'password is required'),
 });
 
-export { loginSchema };
+export type LoginInput = z.infer<typeof loginSchema>;

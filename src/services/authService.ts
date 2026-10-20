@@ -1,13 +1,12 @@
 import { sequelize, Op } from '../config/database.js';
 import User from '../models/User.js';
 import { generateToken } from '../middleware/auth.js';
-import { loginSchema } from '../schemas/loginSchema.js';
 import type { Request, Response } from 'express';
 import bcryptLib from 'bcrypt';
 
 export async function login(req: Request, res: Response) {
   try {
-    const { handleId, password } = loginSchema.parse(req.body);
+    const { handleId, password } = req.body;
 
     const accountQuery = {
       handle_id: sequelize.where(sequelize.fn('LOWER', sequelize.col('handle_id')), {
@@ -30,7 +29,7 @@ export async function login(req: Request, res: Response) {
       });
     }
 
-    const token = generateToken(handleId);
+    const token = generateToken(user.id);
     res.status(200).json({
       token,
       expiresIn: '24h',

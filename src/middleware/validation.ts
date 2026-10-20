@@ -1,4 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
+import { z } from 'zod';
+import { loginSchema } from '../schemas/loginSchema.js';
+import { transferSchema, adminTransferSchema } from '../schemas/transferSchema.js';
+import { walletCreationSchema } from '../schemas/walletSchema.js';
+import { paginationSchema } from '../schemas/paginationSchema.js';
 
 export interface ValidationError {
   field: string;
@@ -6,108 +11,57 @@ export interface ValidationError {
 }
 
 /**
+ * Generic validation middleware factory
+ */
+const createValidationMiddleware = (schema: z.ZodSchema) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    try {
+      // Validate body for POST/PUT requests, query for GET requests
+      const data = ['POST', 'PUT'].includes(req.method) ? req.body : req.query;
+      schema.parse(data);
+      next();
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: ValidationError[] = error.errors.map((err) => ({
+          field: err.path.join('.'),
+          message: err.message,
+        }));
+
+        res.status(400).json({
+          error: 'Validation failed',
+          details: errors,
+        });
+        return;
+      }
+
+      res.status(500).json({
+        error: 'Internal validation error',
+      });
+    }
+  };
+};
+
+/**
+ * Validate login request
+ */
+export const validateLogin = createValidationMiddleware(loginSchema);
+
+/**
  * Validate transfer request body
  */
-export const validateTransfer = (req: Request, res: Response, next: NextFunction): void => {
-  const { senderId, recipientId, amount } = req.body;
-  const errors: ValidationError[] = [];
+export const validateTransfer = createValidationMiddleware(transferSchema);
 
-  if (!senderId || typeof senderId !== 'string') {
-    errors.push({
-      field: 'senderId',
-      message: 'senderId is required and must be a string',
-    });
-  }
-
-  if (!recipientId || typeof recipientId !== 'string') {
-    errors.push({
-      field: 'recipientId',
-      message: 'recipientId is required and must be a string',
-    });
-  }
-
-  if (amount === undefined || amount === null) {
-    errors.push({ field: 'amount', message: 'amount is required' });
-  } else if (typeof amount !== 'number' || amount <= 0) {
-    errors.push({
-      field: 'amount',
-      message: 'amount must be a positive number',
-    });
-  }
-
-  if (errors.length > 0) {
-    res.status(400).json({
-      error: 'Validation failed',
-      details: errors,
-    });
-    return;
-  }
-
-  next();
-};
+/**
+ * Validate admin transfer request body
+ */
+export const validateAdminTransfer = createValidationMiddleware(adminTransferSchema);
 
 /**
  * Validate wallet creation request
  */
-export const validateWalletCreation = (req: Request, res: Response, next: NextFunction): void => {
-  const { userId, initialBalance } = req.body;
-  const errors: ValidationError[] = [];
-
-  if (!userId || typeof userId !== 'string') {
-    errors.push({
-      field: 'userId',
-      message: 'userId is required and must be a string',
-    });
-  }
-
-  if (initialBalance !== undefined && initialBalance !== null) {
-    if (typeof initialBalance !== 'number' || initialBalance < 0) {
-      errors.push({
-        field: 'initialBalance',
-        message: 'initialBalance must be a non-negative number',
-      });
-    }
-  }
-
-  if (errors.length > 0) {
-    res.status(400).json({
-      error: 'Validation failed',
-      details: errors,
-    });
-    return;
-  }
-
-  next();
-};
+export const validateWalletCreation = createValidationMiddleware(walletCreationSchema);
 
 /**
  * Validate query parameters for pagination
  */
-export const validatePagination = (req: Request, res: Response, next: NextFunction): void => {
-  const { limit, offset } = req.query;
-  const errors: ValidationError[] = [];
-
-  if (limit !== undefined && (typeof limit !== 'string' || isNaN(parseInt(limit)))) {
-    errors.push({
-      field: 'limit',
-      message: 'limit must be a valid number',
-    });
-  }
-
-  if (offset !== undefined && (typeof offset !== 'string' || isNaN(parseInt(offset)))) {
-    errors.push({
-      field: 'offset',
-      message: 'offset must be a valid number',
-    });
-  }
-
-  if (errors.length > 0) {
-    res.status(400).json({
-      error: 'Validation failed',
-      details: errors,
-    });
-    return;
-  }
-
-  next();
-};
+export const validatePagination = createValidationMiddleware(paginationSchema);
