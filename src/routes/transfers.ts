@@ -62,17 +62,17 @@ const router = Router();
  *                   type: boolean
  *                 transaction:
  *                   type: object
- *                    properties:
- *                      id:
- *                        type: string
- *                      senderId:
- *                        type: string
- *                      recipientId:
- *                        type: string
- *                      amount:
- *                        type: number
- *                      status:
- *                        type: string
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     senderId:
+ *                       type: string
+ *                     recipientId:
+ *                       type: string
+ *                     amount:
+ *                       type: number
+ *                     status:
+ *                       type: string
  *       400:
  *         description: Invalid transfer data or limit exceeded
  *       401:

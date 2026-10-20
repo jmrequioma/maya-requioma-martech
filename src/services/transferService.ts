@@ -225,7 +225,6 @@ async function executeTransfer(
       });
     }
 
-    // Check transfer limits
     const limitUsage = await getLimitUsage(senderId);
     if (limitUsage.daily.remaining < amount) {
       await txn.rollback();

@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { validateAdminTransfer } from '../middleware/validation.js';
 import { adminTransferMoney } from '../services/transferService.js';
-import type { AuthRequest } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -55,7 +54,7 @@ const router = Router();
  *                   type: boolean
  *                 transaction:
  *                   type: object
- *                    properties:
+ *                   properties:
  *                      id:
  *                        type: string
  *                      senderId:

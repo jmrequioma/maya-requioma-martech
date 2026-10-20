@@ -1,5 +1,7 @@
 import { sequelize, Op } from '../config/database.js';
 import User from '../models/User.js';
+import UserRoles from '../models/UserRole.js';
+import Role from '../models/Role.js';
 import { generateToken } from '../middleware/auth.js';
 import type { Request, Response } from 'express';
 import bcryptLib from 'bcrypt';
@@ -20,6 +22,9 @@ export async function login(req: Request, res: Response) {
         error: 'User not found',
       });
     }
+    const adminRole = await Role.findOne({ where: { type: 'ADM' } });
+    const isAdmin =
+      (await UserRoles.findOne({ where: { userId: user.id, roleId: adminRole?.id } })) !== null;
     // Check password
     const retPassword = user.password;
     const passwordMatch = await bcryptLib.compare(password, retPassword);
@@ -29,7 +34,7 @@ export async function login(req: Request, res: Response) {
       });
     }
 
-    const token = generateToken(user.id);
+    const token = generateToken(user.id, isAdmin);
     res.status(200).json({
       token,
       expiresIn: '24h',
