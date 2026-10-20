@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken } from '../middleware/auth.js';
+import { authenticateToken, authenticateIsAdminToken } from '../middleware/auth.js';
 import authRoutes from './auth.js';
 import transferRoutes from './transfers.js';
 import walletRoutes from './wallet.js';
@@ -15,6 +15,6 @@ apiRouter.use('/auth', authRoutes);
 apiRouter.use('/v1', authenticateToken, transferRoutes);
 apiRouter.use('/v1', authenticateToken, walletRoutes);
 apiRouter.use('/v1', authenticateToken, limitRoutes);
-apiRouter.use('/v1/admin', authenticateToken, adminRoutes);
+apiRouter.use('/v1/admin', authenticateIsAdminToken, adminRoutes);
 
 export default apiRouter;
