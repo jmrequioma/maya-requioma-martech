@@ -9,6 +9,10 @@ package-lock.json
 
 # Build output
 dist/
+swagger.js
+swagger.d.ts
+swagger.js.map
+swagger.d.ts.map
 
 # IDE
 .vscode/

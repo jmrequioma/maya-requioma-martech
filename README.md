@@ -66,6 +66,7 @@ A TypeScript + Express.js server with Sequelize ORM and PostgreSQL, containerize
    DB_PASSWORD=your_password
    PORT=3000
    NODE_ENV=development
+   JWT_SECRET=your_secret
    ```
 
 3. **Run migrations and seeders:**
@@ -74,7 +75,7 @@ A TypeScript + Express.js server with Sequelize ORM and PostgreSQL, containerize
   npm run seed
   ```
 
-  Seeders will generate an admin user and multiple users with wallets. See [seeders folder](seeders/)
+  Seeders will generate an admin user and multiple users with wallets. See [seeders folder](seeders/).
 
 4. **Build and run:**
    ```bash

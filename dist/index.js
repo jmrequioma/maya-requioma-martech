@@ -4,18 +4,23 @@ import apiRouter from './routes/api.js';
 import { logger } from './middleware/logger.js';
 import { apiLimiter } from './middleware/rateLimiter.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './config/swagger.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 app.use(logger);
 app.use(apiLimiter);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Routes
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', message: 'Send Money Limits Module is running' });
 });
 // API Routes
 app.use('/api', apiRouter);
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(notFoundHandler);
 app.use(errorHandler);
 // Initialize database and start server

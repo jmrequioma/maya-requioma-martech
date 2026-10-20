@@ -17,6 +17,61 @@ import { transferLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
+/**
+ * @swagger
+ * /api/v1/transfers:
+ *   post:
+ *     summary: Transfer money between users
+ *     description: Transfer money from sender to recipient with idempotency support
+ *     tags:
+ *       - Transfers
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - senderId
+ *               - recipientId
+ *               - amount
+ *             properties:
+ *               senderId:
+ *                 type: string
+ *                 example: user-123
+ *               recipientId:
+ *                 type: string
+ *                 example: user-456
+ *               amount:
+ *                 type: number
+ *                 example: 100.50
+ *     parameters:
+ *       - in: header
+ *         name: idempotency-key
+ *         schema:
+ *           type: string
+ *         description: Unique identifier for idempotent requests
+ *     responses:
+ *       201:
+ *         description: Transfer successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 transaction:
+ *                   type: object
+ *       400:
+ *         description: Invalid transfer data or limit exceeded
+ *       429:
+ *         description: Rate limit exceeded
+ *       500:
+ *         description: Internal server error
+ */
 router.post(
   '/transfers',
   validateTransfer,
@@ -54,6 +109,91 @@ router.post(
   }
 );
 
+/**
+ * @swagger
+ * /api/v1/limits/{userId}:
+ *   get:
+ *     summary: Get user transfer limits and usage
+ *     description: Retrieve the current transfer limits and usage for a user
+ *     tags:
+ *       - Limits
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user ID
+ *     responses:
+ *       200:
+ *         description: Limits retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userId:
+ *                   type: string
+ *                 dailyLimit:
+ *                   type: number
+ *                 dailyUsed:
+ *                   type: number
+ *                 monthlyLimit:
+ *                   type: number
+ *                 monthlyUsed:
+ *                   type: number
+ *       400:
+ *         description: Missing userId parameter
+ *       500:
+ *         description: Internal server error
+ *   put:
+ *     summary: Update user transfer limits
+ *     description: Update the daily and/or monthly transfer limits for a user
+ *     tags:
+ *       - Limits
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               dailyLimit:
+ *                 type: number
+ *                 example: 5000
+ *               monthlyLimit:
+ *                 type: number
+ *                 example: 50000
+ *     responses:
+ *       200:
+ *         description: Limits updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userId:
+ *                   type: string
+ *                 dailyLimit:
+ *                   type: number
+ *                 monthlyLimit:
+ *                   type: number
+ *       400:
+ *         description: Invalid limit values
+ *       500:
+ *         description: Internal server error
+ */
 router.get('/limits/:userId', async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.params.userId as string;
@@ -78,6 +218,55 @@ router.get('/limits/:userId', async (req: AuthRequest, res: Response) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/history/{userId}:
+ *   get:
+ *     summary: Get transaction history
+ *     description: Retrieve paginated transaction history for a user
+ *     tags:
+ *       - Transactions
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user ID
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *           maximum: 100
+ *         description: Number of records to return
+ *       - in: query
+ *         name: offset
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *         description: Number of records to skip
+ *     responses:
+ *       200:
+ *         description: Transaction history retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userId:
+ *                   type: string
+ *                 transactions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *       400:
+ *         description: Missing userId parameter or invalid pagination
+ *       500:
+ *         description: Internal server error
+ */
 router.get('/history/:userId', validatePagination, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.params.userId as string;
@@ -104,6 +293,81 @@ router.get('/history/:userId', validatePagination, async (req: AuthRequest, res:
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/wallet/{userId}:
+ *   get:
+ *     summary: Get user wallet
+ *     description: Retrieve wallet information for a user
+ *     tags:
+ *       - Wallet
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user ID
+ *     responses:
+ *       200:
+ *         description: Wallet retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 userId:
+ *                   type: string
+ *                 balance:
+ *                   type: number
+ *       404:
+ *         description: Wallet not found
+ *       500:
+ *         description: Internal server error
+ *   post:
+ *     summary: Create wallet
+ *     description: Create a new wallet for a user
+ *     tags:
+ *       - Wallet
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               initialBalance:
+ *                 type: number
+ *                 default: 0
+ *     responses:
+ *       201:
+ *         description: Wallet created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 userId:
+ *                   type: string
+ *                 balance:
+ *                   type: number
+ *       400:
+ *         description: Invalid wallet data
+ *       500:
+ *         description: Internal server error
+ */
 router.get('/wallet/:userId', async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.params.userId as string;

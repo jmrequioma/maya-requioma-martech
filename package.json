@@ -46,6 +46,8 @@
     "pg": "^8.23.1",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.8",
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1",
     "zod": "^3.24.1"
   },
   "devDependencies": {
@@ -55,6 +57,8 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.6.5",
     "@types/pg": "^8.23.1",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "@vitest/ui": "^5.0.5",
     "eslint": "^8.57.1",
     "husky": "^9.1.4",
