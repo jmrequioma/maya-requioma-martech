@@ -4,7 +4,7 @@
 module.exports = {
   async up (queryInterface, Sequelize) {
     const [normalUsers] = await queryInterface.sequelize.query(
-      'SELECT id FROM users ORDER BY handle_id ASC;',
+      'SELECT id FROM users WHERE handle_id != \'admin@example.com\' ORDER BY handle_id ASC;',
     );
 
     const [adminUser] = await queryInterface.sequelize.query(
