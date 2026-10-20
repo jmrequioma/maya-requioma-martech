@@ -78,7 +78,7 @@ async function getMonthlySpent(userId: string): Promise<number> {
 /**
  * Get user's transfer limits (daily and monthly)
  */
-async function getUserLimits(userId: string) {
+async function getDefaultLimits(userId: string) {
   let limits = await UserTransferLimit.findOne({ where: { userId } });
 
   if (!limits) {
@@ -100,7 +100,7 @@ async function getUserLimits(userId: string) {
  * Get limit usage for a user
  */
 export async function getLimitUsage(userId: string): Promise<LimitUsage> {
-  const { dailyLimit, monthlyLimit } = await getUserLimits(userId);
+  const { dailyLimit, monthlyLimit } = await getDefaultLimits(userId);
   const dailySpent = await getDailySpent(userId);
   const monthlySpent = await getMonthlySpent(userId);
 
@@ -348,21 +348,75 @@ export async function adminTransferMoney(req: AuthRequest, res: Response) {
 /**
  * Get wallet for a user
  */
-export async function getWallet(userId: string) {
-  const wallet = await Wallet.findOne({ where: { userId } });
-
-  if (!wallet) {
-    return {
-      error: 'Wallet not found',
-    };
+/**
+ * Internal wallet retrieval logic
+ */
+async function fetchWallet(userId: string, res: Response) {
+  if (!userId) {
+    return res.status(400).json({
+      error: 'Missing userId parameter',
+    });
   }
 
-  return {
-    userId,
-    balance: parseFloat(wallet.balance.toString()),
-    totalSent: parseFloat(wallet.totalSent.toString()),
-    totalReceived: parseFloat(wallet.totalReceived.toString()),
-  };
+  try {
+    const wallet = await Wallet.findOne({ where: { userId } });
+
+    if (!wallet) {
+      return res.status(404).json({
+        error: 'Wallet not found',
+      });
+    }
+
+    return res.status(200).json({
+      userId,
+      balance: parseFloat(wallet.balance.toString()),
+      totalSent: parseFloat(wallet.totalSent.toString()),
+      totalReceived: parseFloat(wallet.totalReceived.toString()),
+    });
+  } catch (error) {
+    console.error('Get wallet error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
+  }
+}
+
+/**
+ * Get authenticated user's wallet
+ */
+export async function getUserWallet(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.userId!;
+
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Unauthorized: missing user ID',
+      });
+    }
+
+    return fetchWallet(userId, res);
+  } catch (error) {
+    console.error('Get user wallet error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
+  }
+}
+
+/**
+ * Get any user's wallet (ADMIN)
+ */
+export async function getAdminWallet(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.params.userId as string;
+
+    return fetchWallet(userId, res);
+  } catch (error) {
+    console.error('Get admin wallet error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
+  }
 }
 
 /**
@@ -499,17 +553,24 @@ export async function getAdminTransactionHistory(req: AuthRequest, res: Response
 }
 
 /**
- * Get transaction history (DEPRECATED - use getUserTransactionHistory or getAdminTransactionHistory)
+ * Internal limits retrieval logic
  */
-export async function getTransactionHistory(req: AuthRequest, res: Response) {
-  try {
-    const userId = req.params.userId as string;
-    const limit = parseInt(req.query.limit as string) || 50;
-    const offset = parseInt(req.query.offset as string) || 0;
+async function fetchLimitUsage(userId: string, res: Response) {
+  if (!userId) {
+    return res.status(400).json({
+      error: 'Missing userId parameter',
+    });
+  }
 
-    return fetchTransactionHistory(userId, limit, offset, res);
+  try {
+    const limitUsage = await getLimitUsage(userId);
+
+    return res.status(200).json({
+      userId,
+      ...limitUsage,
+    });
   } catch (error) {
-    console.error('Transaction history error:', error);
+    console.error('Get limit usage error:', error);
     return res.status(500).json({
       error: 'Internal server error',
     });
@@ -517,9 +578,70 @@ export async function getTransactionHistory(req: AuthRequest, res: Response) {
 }
 
 /**
- * Update transfer limits for a user
+ * Get authenticated user's transfer limits and usage
  */
-export async function updateUserLimits(userId: string, dailyLimit?: number, monthlyLimit?: number) {
+export async function getUserLimits(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.userId!;
+
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Unauthorized: missing user ID',
+      });
+    }
+
+    return fetchLimitUsage(userId, res);
+  } catch (error) {
+    console.error('Get user limits error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
+  }
+}
+
+/**
+ * Get any user's transfer limits and usage (ADMIN)
+ */
+export async function getAdminLimits(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.params.userId as string;
+
+    return fetchLimitUsage(userId, res);
+  } catch (error) {
+    console.error('Get admin limits error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
+  }
+}
+
+/**
+ * Internal limits update logic
+ */
+async function updateLimits(
+  userId: string,
+  dailyLimit: number | undefined,
+  monthlyLimit: number | undefined,
+  res: Response
+) {
+  if (!userId) {
+    return res.status(400).json({
+      error: 'Missing userId parameter',
+    });
+  }
+
+  if (dailyLimit !== undefined && (typeof dailyLimit !== 'number' || dailyLimit <= 0)) {
+    return res.status(400).json({
+      error: 'dailyLimit must be a positive number',
+    });
+  }
+
+  if (monthlyLimit !== undefined && (typeof monthlyLimit !== 'number' || monthlyLimit <= 0)) {
+    return res.status(400).json({
+      error: 'monthlyLimit must be a positive number',
+    });
+  }
+
   try {
     let limits = await UserTransferLimit.findOne({ where: { userId } });
 
@@ -535,18 +657,55 @@ export async function updateUserLimits(userId: string, dailyLimit?: number, mont
       await limits.save();
     }
 
-    return {
-      success: true,
-      limits: {
-        userId,
-        dailyLimit: parseFloat(limits.dailyLimit.toString()),
-        monthlyLimit: parseFloat(limits.monthlyLimit.toString()),
-      },
-    };
+    return res.status(200).json({
+      userId,
+      dailyLimit: parseFloat(limits.dailyLimit.toString()),
+      monthlyLimit: parseFloat(limits.monthlyLimit.toString()),
+    });
   } catch (error) {
-    return {
-      success: false,
-      error: 'Failed to update limits',
-    };
+    console.error('Update limits error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
+  }
+}
+
+/**
+ * Update authenticated user's transfer limits
+ */
+export async function updateUserLimits(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.userId!;
+
+    if (!userId) {
+      return res.status(401).json({
+        error: 'Unauthorized: missing user ID',
+      });
+    }
+
+    const { dailyLimit, monthlyLimit } = req.body;
+    return updateLimits(userId, dailyLimit, monthlyLimit, res);
+  } catch (error) {
+    console.error('Update user limits error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
+  }
+}
+
+/**
+ * Update any user's transfer limits (ADMIN)
+ */
+export async function updateAdminLimits(req: AuthRequest, res: Response) {
+  try {
+    const userId = req.params.userId as string;
+    const { dailyLimit, monthlyLimit } = req.body;
+
+    return updateLimits(userId, dailyLimit, monthlyLimit, res);
+  } catch (error) {
+    console.error('Update admin limits error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
   }
 }

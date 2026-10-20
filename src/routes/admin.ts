@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { validateAdminTransfer, validatePagination } from '../middleware/validation.js';
-import { adminTransferMoney, getAdminTransactionHistory } from '../services/transferService.js';
+import {
+  adminTransferMoney,
+  getAdminTransactionHistory,
+  getAdminLimits,
+  updateAdminLimits,
+} from '../services/transferService.js';
 
 const router = Router();
 
@@ -80,11 +85,10 @@ router.post('/transfers', validateAdminTransfer, adminTransferMoney);
  * @swagger
  * /api/v1/admin/transfers/history/{userId}:
  *   get:
- *     summary: Get transaction history for any user (ADMIN)
+ *     summary: Get transaction history for any user
  *     description: Retrieve paginated transaction history for a specified user
  *     tags:
  *       - Admin
- *       - Transactions
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -129,5 +133,107 @@ router.post('/transfers', validateAdminTransfer, adminTransferMoney);
  *         description: Internal server error
  */
 router.get('/transfers/history/:userId', validatePagination, getAdminTransactionHistory);
+
+/**
+ * @swagger
+ * /api/v1/admin/limits/{userId}:
+ *   get:
+ *     summary: Get any user's transfer limits and usage (ADMIN)
+ *     description: Retrieve the current transfer limits and usage for a specified user
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user ID
+ *     responses:
+ *       200:
+ *         description: Limits retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userId:
+ *                   type: string
+ *                 daily:
+ *                   type: object
+ *                   properties:
+ *                     used:
+ *                       type: number
+ *                     limit:
+ *                       type: number
+ *                     remaining:
+ *                       type: number
+ *                     percentage:
+ *                       type: number
+ *                 monthly:
+ *                   type: object
+ *                   properties:
+ *                     used:
+ *                       type: number
+ *                     limit:
+ *                       type: number
+ *                     remaining:
+ *                       type: number
+ *                     percentage:
+ *                       type: number
+ *       400:
+ *         description: Missing userId parameter
+ *       500:
+ *         description: Internal server error
+ *   put:
+ *     summary: Update any user's transfer limits (ADMIN)
+ *     description: Update the daily and/or monthly transfer limits for a specified user
+ *     tags:
+ *       - Admin
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The user ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               dailyLimit:
+ *                 type: number
+ *                 example: 5000
+ *               monthlyLimit:
+ *                 type: number
+ *                 example: 50000
+ *     responses:
+ *       200:
+ *         description: Limits updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userId:
+ *                   type: string
+ *                 dailyLimit:
+ *                   type: number
+ *                 monthlyLimit:
+ *                   type: number
+ *       400:
+ *         description: Invalid limit values
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/limits/:userId', getAdminLimits);
+router.put('/limits/:userId', updateAdminLimits);
 
 export default router;

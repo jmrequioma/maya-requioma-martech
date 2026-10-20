@@ -1,11 +1,14 @@
 import { Router, Response } from 'express';
 import {
   getLimitUsage,
-  getTransactionHistory,
   getUserTransactionHistory,
-  getWallet,
+  getUserWallet,
+  getAdminWallet,
   createWallet,
   updateUserLimits,
+  updateAdminLimits,
+  getUserLimits,
+  getAdminLimits,
   userTransferMoney,
 } from '../services/transferService.js';
 import { AuthRequest } from '../middleware/auth.js';
@@ -87,21 +90,14 @@ router.post('/transfers', validateTransfer, transferLimiter, userTransferMoney);
 
 /**
  * @swagger
- * /api/v1/limits/{userId}:
+ * /api/v1/limits:
  *   get:
- *     summary: Get user transfer limits and usage
- *     description: Retrieve the current transfer limits and usage for a user
+ *     summary: Get authenticated user's transfer limits and usage
+ *     description: Retrieve the current transfer limits and usage for the authenticated user
  *     tags:
  *       - Limits
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: The user ID
  *     responses:
  *       200:
  *         description: Limits retrieved successfully
@@ -112,32 +108,39 @@ router.post('/transfers', validateTransfer, transferLimiter, userTransferMoney);
  *               properties:
  *                 userId:
  *                   type: string
- *                 dailyLimit:
- *                   type: number
- *                 dailyUsed:
- *                   type: number
- *                 monthlyLimit:
- *                   type: number
- *                 monthlyUsed:
- *                   type: number
- *       400:
- *         description: Missing userId parameter
+ *                 daily:
+ *                   type: object
+ *                   properties:
+ *                     used:
+ *                       type: number
+ *                     limit:
+ *                       type: number
+ *                     remaining:
+ *                       type: number
+ *                     percentage:
+ *                       type: number
+ *                 monthly:
+ *                   type: object
+ *                   properties:
+ *                     used:
+ *                       type: number
+ *                     limit:
+ *                       type: number
+ *                     remaining:
+ *                       type: number
+ *                     percentage:
+ *                       type: number
+ *       401:
+ *         description: Unauthorized
  *       500:
  *         description: Internal server error
  *   put:
- *     summary: Update user transfer limits
- *     description: Update the daily and/or monthly transfer limits for a user
+ *     summary: Update authenticated user's transfer limits
+ *     description: Update the daily and/or monthly transfer limits for the authenticated user
  *     tags:
  *       - Limits
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: The user ID
  *     requestBody:
  *       required: true
  *       content:
@@ -167,32 +170,13 @@ router.post('/transfers', validateTransfer, transferLimiter, userTransferMoney);
  *                   type: number
  *       400:
  *         description: Invalid limit values
+ *       401:
+ *         description: Unauthorized
  *       500:
  *         description: Internal server error
  */
-router.get('/limits/:userId', async (req: AuthRequest, res: Response) => {
-  try {
-    const userId = req.params.userId as string;
-
-    if (!userId) {
-      return res.status(400).json({
-        error: 'Missing userId parameter',
-      });
-    }
-
-    const limitUsage = await getLimitUsage(userId);
-
-    return res.status(200).json({
-      userId,
-      ...limitUsage,
-    });
-  } catch (error) {
-    console.error('Limit usage error:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
-    });
-  }
-});
+router.get('/limits', getUserLimits);
+router.put('/limits', updateUserLimits);
 
 /**
  * @swagger
@@ -243,91 +227,45 @@ router.get('/history', validatePagination, getUserTransactionHistory);
 
 /**
  * @swagger
- * /api/v1/admin/transfers/history/{userId}:
+ * /api/v1/wallet:
  *   get:
- *     summary: Get transaction history for any user (ADMIN)
- *     description: Retrieve paginated transaction history for a specified user
+ *     summary: Get authenticated user's wallet
+ *     description: Retrieve wallet information for the authenticated user
  *     tags:
- *       - Admin
- *       - Transactions
+ *       - Wallet
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: The user ID
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 50
- *           maximum: 100
- *         description: Number of records to return
- *       - in: query
- *         name: offset
- *         schema:
- *           type: integer
- *           default: 0
- *         description: Number of records to skip
  *     responses:
  *       200:
- *         description: Transaction history retrieved successfully
- *       400:
- *         description: Missing userId parameter
+ *         description: Wallet retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 userId:
+ *                   type: string
+ *                 balance:
+ *                   type: number
+ *                 totalSent:
+ *                   type: number
+ *                 totalReceived:
+ *                   type: number
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Wallet not found
  *       500:
  *         description: Internal server error
  */
-
-/**
- * @swagger
- * /api/v1/history/{userId}:
- *   get:
- *     summary: Get transaction history (DEPRECATED)
- *     description: Use /api/v1/transfers/history or /api/v1/admin/transfers/history/{userId} instead
- *     tags:
- *       - Transactions
- *     deprecated: true
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *         description: The user ID
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 50
- *           maximum: 100
- *         description: Number of records to return
- *       - in: query
- *         name: offset
- *         schema:
- *           type: integer
- *           default: 0
- *         description: Number of records to skip
- *     responses:
- *       200:
- *         description: Transaction history retrieved successfully
- *       400:
- *         description: Missing userId parameter or invalid pagination
- *       500:
- *         description: Internal server error
- */
-router.get('/history/:userId', validatePagination, getTransactionHistory);
+router.get('/wallet', getUserWallet);
 
 /**
  * @swagger
  * /api/v1/wallet/{userId}:
  *   get:
- *     summary: Get user wallet
- *     description: Retrieve wallet information for a user
+ *     summary: Get any user's wallet (ADMIN)
+ *     description: Retrieve wallet information for a specified user
  *     tags:
  *       - Wallet
  *     security:
@@ -347,19 +285,23 @@ router.get('/history/:userId', validatePagination, getTransactionHistory);
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: string
  *                 userId:
  *                   type: string
  *                 balance:
  *                   type: number
+ *                 totalSent:
+ *                   type: number
+ *                 totalReceived:
+ *                   type: number
+ *       400:
+ *         description: Missing userId parameter
  *       404:
  *         description: Wallet not found
  *       500:
  *         description: Internal server error
  *   post:
- *     summary: Create wallet
- *     description: Create a new wallet for a user
+ *     summary: Create wallet for a user
+ *     description: Create a new wallet for a specified user
  *     tags:
  *       - Wallet
  *     security:
@@ -370,11 +312,7 @@ router.get('/history/:userId', validatePagination, getTransactionHistory);
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - userId
  *             properties:
- *               userId:
- *                 type: string
  *               initialBalance:
  *                 type: number
  *                 default: 0
@@ -397,36 +335,12 @@ router.get('/history/:userId', validatePagination, getTransactionHistory);
  *       500:
  *         description: Internal server error
  */
-router.get('/wallet/:userId', async (req: AuthRequest, res: Response) => {
+router.get('/wallet/:userId', getAdminWallet);
+
+router.post('/wallet/:userId', validateWalletCreation, async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.params.userId as string;
-
-    if (!userId) {
-      return res.status(400).json({
-        error: 'Missing userId parameter',
-      });
-    }
-
-    const wallet = await getWallet(userId);
-
-    if (wallet.error) {
-      return res.status(404).json({
-        error: wallet.error,
-      });
-    }
-
-    return res.status(200).json(wallet);
-  } catch (error) {
-    console.error('Wallet error:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
-    });
-  }
-});
-
-router.post('/wallet', validateWalletCreation, async (req: AuthRequest, res: Response) => {
-  try {
-    const { userId, initialBalance } = req.body;
+    const { initialBalance } = req.body;
 
     const result = await createWallet(userId, initialBalance || 0);
 
@@ -439,47 +353,6 @@ router.post('/wallet', validateWalletCreation, async (req: AuthRequest, res: Res
     }
   } catch (error) {
     console.error('Create wallet error:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
-    });
-  }
-});
-
-router.put('/limits/:userId', async (req: AuthRequest, res: Response) => {
-  try {
-    const userId = req.params.userId as string;
-    const { dailyLimit, monthlyLimit } = req.body;
-
-    if (!userId) {
-      return res.status(400).json({
-        error: 'Missing userId parameter',
-      });
-    }
-
-    // Validate limit values if provided
-    if (dailyLimit !== undefined && (typeof dailyLimit !== 'number' || dailyLimit <= 0)) {
-      return res.status(400).json({
-        error: 'dailyLimit must be a positive number',
-      });
-    }
-
-    if (monthlyLimit !== undefined && (typeof monthlyLimit !== 'number' || monthlyLimit <= 0)) {
-      return res.status(400).json({
-        error: 'monthlyLimit must be a positive number',
-      });
-    }
-
-    const result = await updateUserLimits(userId, dailyLimit, monthlyLimit);
-
-    if (result.success) {
-      return res.status(200).json(result.limits);
-    } else {
-      return res.status(400).json({
-        error: result.error,
-      });
-    }
-  } catch (error) {
-    console.error('Update limits error:', error);
     return res.status(500).json({
       error: 'Internal server error',
     });
