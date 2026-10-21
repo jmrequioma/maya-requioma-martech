@@ -8,9 +8,6 @@ import { sequelize } from '../config/database.js';
 const DEFAULT_DAILY_LIMIT = 50000; // ₱50,000
 const DEFAULT_MONTHLY_LIMIT = 500000; // ₱500,000
 
-/**
- * Internal wallet retrieval logic (returns data, no HTTP handling)
- */
 export async function fetchWallet(userId: string) {
   if (!userId) {
     const error = new Error('Missing userId parameter');
@@ -87,7 +84,7 @@ export async function getAdminWallet(req: AuthRequest, res: Response) {
   }
 }
 
-async function performWalletCreation(userId: string, initialBalance: number = 0) {
+export async function performWalletCreation(userId: string, initialBalance: number = 0) {
   const txn = await sequelize.transaction();
   try {
     const foundWallet = await Wallet.findOne({ where: { userId } });

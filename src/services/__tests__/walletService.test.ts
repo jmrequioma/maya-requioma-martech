@@ -75,5 +75,26 @@ describe('WalletService', () => {
         totalReceived: 0,
       });
     });
+
+    it('should not fetch a wallet that does not exist', async () => {
+      vi.mocked(Wallet.findOne).mockResolvedValue(null);
+
+      await expect(walletModule.fetchWallet(testUserId)).rejects.toThrow('Wallet not found');
+    });
+
+    it('should throw an error if user already has a wallet', async () => {
+      vi.mocked(Wallet.findOne).mockResolvedValue({
+        id: faker.string.uuid(),
+        userId: testUserId,
+        balance: 1000,
+        totalSent: 0,
+        totalReceived: 0,
+      } as unknown as Awaited<ReturnType<typeof Wallet.findOne>>);
+
+      await expect(walletModule.performWalletCreation(testUserId)).resolves.toEqual({
+        success: false,
+        error: 'Wallet already exists for this user',
+      });
+    });
   });
 });
