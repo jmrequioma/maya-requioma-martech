@@ -259,6 +259,7 @@ The PostgreSQL container:
 | DB_PASSWORD | password | password | Change in production |
 | PORT | 3000 | 3000 | - |
 | NODE_ENV | development | development | - |
+| JWT_SECRET | some-secret-key | some-secret-key | Change in production
 
 ## Assumptions and Scope
 
