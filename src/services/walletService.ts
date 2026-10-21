@@ -9,35 +9,38 @@ const DEFAULT_DAILY_LIMIT = 50000; // ₱50,000
 const DEFAULT_MONTHLY_LIMIT = 500000; // ₱500,000
 
 /**
- * Internal wallet retrieval logic
+ * Internal wallet retrieval logic (returns data, no HTTP handling)
  */
-async function fetchWallet(userId: string, res: Response) {
+export async function fetchWallet(userId: string) {
   if (!userId) {
-    return res.status(400).json({
-      error: 'Missing userId parameter',
-    });
+    const error = new Error('Missing userId parameter');
+    (error as any).statusCode = 400;
+    throw error;
   }
 
   try {
     const wallet = await Wallet.findOne({ where: { userId } });
 
     if (!wallet) {
-      return res.status(404).json({
-        error: 'Wallet not found',
-      });
+      const error = new Error('Wallet not found');
+      (error as any).statusCode = 404;
+      throw error;
     }
 
-    return res.status(200).json({
+    return {
       userId,
       balance: parseFloat(wallet.balance.toString()),
       totalSent: parseFloat(wallet.totalSent.toString()),
       totalReceived: parseFloat(wallet.totalReceived.toString()),
-    });
+    };
   } catch (error) {
+    if ((error as any).statusCode) {
+      throw error;
+    }
     console.error('Get wallet error:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
-    });
+    const err = new Error('Internal server error');
+    (err as any).statusCode = 500;
+    throw err;
   }
 }
 
@@ -54,11 +57,14 @@ export async function getUserWallet(req: AuthRequest, res: Response) {
       });
     }
 
-    return fetchWallet(userId, res);
+    const walletData = await fetchWallet(userId);
+    return res.status(200).json(walletData);
   } catch (error) {
+    const statusCode = (error as any).statusCode || 500;
+    const message = (error as Error).message || 'Internal server error';
     console.error('Get user wallet error:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
+    return res.status(statusCode).json({
+      error: message,
     });
   }
 }
@@ -69,12 +75,14 @@ export async function getUserWallet(req: AuthRequest, res: Response) {
 export async function getAdminWallet(req: AuthRequest, res: Response) {
   try {
     const userId = req.params.userId as string;
-
-    return fetchWallet(userId, res);
+    const walletData = await fetchWallet(userId);
+    return res.status(200).json(walletData);
   } catch (error) {
+    const statusCode = (error as any).statusCode || 500;
+    const message = (error as Error).message || 'Internal server error';
     console.error('Get admin wallet error:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
+    return res.status(statusCode).json({
+      error: message,
     });
   }
 }
