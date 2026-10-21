@@ -84,6 +84,7 @@ A TypeScript + Express.js server with Sequelize ORM and PostgreSQL, containerize
    DB_HOST=localhost
    DB_PORT=5432
    NODE_ENV=development
+   JWT=some-secret-key
    ```
 
 3. **Run migrations** (creates database schema):
