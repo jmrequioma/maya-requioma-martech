@@ -8,6 +8,7 @@ A TypeScript + Express.js server with Sequelize ORM and PostgreSQL, containerize
 
 ## API Documentation
 - [Swagger URL](http://localhost:3000/api-docs)
+
 ## Quick Start with Docker
 
 ### Prerequisites
@@ -27,7 +28,17 @@ A TypeScript + Express.js server with Sequelize ORM and PostgreSQL, containerize
    - Start the application container
    - Wait for the database to be healthy before starting the app
 
-2. **Verify the server is running:**
+   Wait for the message: `Server is running on port 3000`
+
+2. **Run migrations and seeders** (in a new terminal):
+   ```bash
+   docker compose exec app npm run migrate
+   docker compose exec app npm run seed
+   ```
+
+   This creates the database schema and populates initial data (roles, users, wallets, limits, transfers).
+
+3. **Verify the server is running:**
    ```bash
    curl http://localhost:3000/health
    ```
@@ -39,7 +50,69 @@ A TypeScript + Express.js server with Sequelize ORM and PostgreSQL, containerize
      "message": "Send Money Limits Module is running"
    }
    ```
-3. **Main APIs:**
+
+4. **Stop the services:**
+   ```bash
+   docker compose down
+   ```
+
+   To also remove the database volume:
+   ```bash
+   docker compose down -v
+   ```
+
+## Local Development (without Docker)
+
+### Prerequisites
+- Node.js (18+)
+- PostgreSQL (locally installed or running)
+- npm or yarn
+
+### Setup
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Configure environment variables:**
+   Create a `.env` file in the root directory:
+   ```
+   DB_NAME=maya_martech
+   DB_USER=postgres
+   DB_PASSWORD=your_password
+   DB_HOST=localhost
+   DB_PORT=5432
+   NODE_ENV=development
+   ```
+
+3. **Run migrations** (creates database schema):
+   ```bash
+   npm run migrate
+   ```
+
+4. **Run seeders** (populates initial data):
+   ```bash
+   npm run seed
+   ```
+
+5. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
+   or with auto-reload:
+   ```bash
+   npm run dev:watch
+   ```
+
+### Database Management
+
+- **Undo last migration:** `npm run migrate:undo`
+- **Undo all migrations:** `npm run migrate:undoAll`
+- **Undo seeds:** `npm run seed:undo`
+- **Undo all seeds:** `npm run seed:undoAll`
+
+## Main APIs:
 
 - Registering a user
 ```
@@ -199,4 +272,5 @@ The PostgreSQL container:
 - [ ] Generate a separate `JWT_SECRET` for the production environment
 - [ ] Generate a different password for the database in the production environment
 - [ ] Remove hardcoded password for users in the seeders
+- [ ] Create a production container image. Currently, the image is suitable only for development purposes.
 
