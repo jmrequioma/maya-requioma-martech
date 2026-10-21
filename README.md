@@ -263,15 +263,16 @@ The PostgreSQL container:
 
 ## Assumptions and Scope
 
-1. Basic authentication only for this app, log out, refresh token functionalities not included
-2. Administrator role can perform CRUD operations for all users
-3. User role can ONLY perform CRUD operations for their own records
+1. Basic authentication only for this app, log out, refresh token functionalities not included.
+2. Administrator role can perform CRUD operations for all users.
+3. User role can ONLY perform CRUD operations for their own records.
 4. The transaction lifecycle will consist of only two statuses: **COMPLETED** and **FAILED**. Transactions are processed synchronously within an atomic database transaction, ensuring that all operations either succeed or roll back entirely.
 5. A user can only have one wallet. The API for creating a wallet fails when a user already has an existing one.
+6. All money transfer endpoints support idempotency via the `idempotency-key` header:
 
 ## Brief Notes before Production Launch
-- [ ] Generate a separate `JWT_SECRET` for the production environment
-- [ ] Generate a different password for the database in the production environment
+- [ ] Generate a separate `JWT_SECRET` for the production environment.
+- [ ] Generate a different password for the database in the production environment.
 - [ ] Remove hardcoded password for users in the seeders
 - [ ] Create a production container image. Currently, the image is suitable only for development purposes.
-
+- [ ] Refactor auth api to use tokens in cookies instead of in the response body.
