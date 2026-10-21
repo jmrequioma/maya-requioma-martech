@@ -192,7 +192,7 @@ The PostgreSQL container:
 1. Basic authentication only for this app, log out, refresh token functionalities not included
 2. Administrator role can perform CRUD operations for all users
 3. User role can ONLY perform CRUD operations for their own records
-4. Transaction lifecycle will only be COMPLETED and FAILED. Synchronous processing of transactions are being done and it is an atomic transaction in the database.
+4. The transaction lifecycle will consist of only two statuses: **COMPLETED** and **FAILED**. Transactions are processed synchronously within an atomic database transaction, ensuring that all operations either succeed or roll back entirely.
 5. A user can only have one wallet. The API for creating a wallet fails when a user already has an existing one.
 
 ## Brief Notes before Production Launch
